@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  agency_id  String?   @db.Uuid
+  username   String
+  email      String
+  password   String
+  full_name  String
+  no_wa      String?
+  role       String    @default("user")
+  is_active  Boolean   @default(true)
+  last_login DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime
+
+  agency            Agency?            @relation("AgencyUsers", fields: [agency_id], references: [id])
+  ownedAgency       Agency[]           @relation("AgencyOwner") // <--- Tambahkan ini
+  contactTags       ContactTag[]
+  contacts          Contact[]
+  userSubscriptions UserSubscription[]
+}
+
+model Agency {
+  id           String   @id @db.Uuid
+  owner_id     String   @db.Uuid
+  name         String
+  slug         String
+  domain       String?
+  company_name String?
+  tagline      String?
+  logo_url     String?
+  favicon_url  String?
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime
+
+  owner         User           @relation("AgencyOwner", fields: [owner_id], references: [id]) // relasi dinyatakan eksplisit
+  users         User[]         @relation("AgencyUsers")
+  subscriptions Subscription[]
+}
+
+model ContactTag {
+  id         Int      @id @default(autoincrement())
+  name       String
+  user_id    String   @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  user     User      @relation(fields: [user_id], references: [id])
+  contacts Contact[]
+}
+
+model Contact {
+  id      Int     @id @default(autoincrement())
+  name    String
+  phone   String
+  email   String?
+  notes   String?
+  user_id String  @db.Uuid
+  tag_id  Int?
+
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  user User        @relation(fields: [user_id], references: [id])
+  tag  ContactTag? @relation(fields: [tag_id], references: [id])
+}
+
+model Subscription {
+  id            Int      @id @default(autoincrement())
+  owner_id      String   @db.Uuid
+  name          String
+  duration_days Int
+  limit_device  Int      @default(1)
+  description   String?
+  price         Decimal  @default(0)
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime
+
+  owner             Agency             @relation(fields: [owner_id], references: [id])
+  userSubscriptions UserSubscription[]
+}
+
+model UserSubscription {
+  id              Int      @id @default(autoincrement())
+  user_id         String   @db.Uuid
+  subscription_id Int
+  status          String   @default("ACTIVE")
+  start_date      DateTime
+  end_date        DateTime
+  created_at      DateTime @default(now())
+  updated_at      DateTime
+
+  user         User         @relation(fields: [user_id], references: [id])
+  subscription Subscription @relation(fields: [subscription_id], references: [id])
+}
