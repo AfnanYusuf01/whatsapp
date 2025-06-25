@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN_GLOBAL
+  AGENCY
+  ADMIN_AGENCY
+  USER
+}
+
 model User {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   agency_id  String?   @db.Uuid
@@ -15,14 +23,14 @@ model User {
   password   String
   full_name  String
   no_wa      String?
-  role       String    @default("user")
+  role       UserRole  @default(USER)
   is_active  Boolean   @default(true)
   last_login DateTime?
   created_at DateTime  @default(now())
   updated_at DateTime
 
   agency            Agency?            @relation("AgencyUsers", fields: [agency_id], references: [id])
-  ownedAgency       Agency[]           @relation("AgencyOwner") // <--- Tambahkan ini
+  ownedAgency       Agency[]           @relation("AgencyOwner")
   contactTags       ContactTag[]
   contacts          Contact[]
   userSubscriptions UserSubscription[]

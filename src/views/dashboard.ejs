@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold"><%= title %></h1>
+                </div>
+                <div class="flex items-center">
+                    <span class="mr-4">Welcome, <%= user.full_name %></span>
+                    <a href="/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <!-- CRUD Menu Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Contact Management -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Contact Management</h3>
+                    <div class="space-y-2">
+                        <a href="/dashboard/contacts" class="block text-blue-600 hover:underline">📋 Manage Contacts</a>
+                        <a href="/dashboard/contact-tags" class="block text-blue-600 hover:underline">🏷️ Manage Contact Tags</a>
+                    </div>
+                </div>
+
+                <% if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_GLOBAL') { %>
+                <!-- User Management -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">User Management</h3>
+                    <div class="space-y-2">
+                        <a href="/dashboard/users" class="block text-blue-600 hover:underline">👥 Manage Users</a>
+                    </div>
+                </div>
+
+                <!-- Agency Management -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Agency Management</h3>
+                    <div class="space-y-2">
+                        <a href="/dashboard/agencies" class="block text-blue-600 hover:underline">🏢 Agency Management</a>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_GLOBAL' || user.role === 'AGENCY') { %>
+                <!-- Subscription Management -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Subscription Management</h3>
+                    <div class="space-y-2">
+                        <a href="/dashboard/subscriptions" class="block text-blue-600 hover:underline">💰 Manage Subscriptions</a>
+                        <a href="/dashboard/user-subscriptions" class="block text-blue-600 hover:underline">👤 User Subscriptions</a>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- Role-specific Features -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Your Role: <%= user.role.replace('_', ' ') %></h3>
+                    <% if (user.role === 'SUPER_ADMIN') { %>
+                        <p class="text-gray-600">You have full access to all features including user management, agency management, and subscription management.</p>
+                    <% } else if (user.role === 'ADMIN_GLOBAL') { %>
+                        <p class="text-gray-600">You can manage users, agencies, and subscriptions globally.</p>
+                    <% } else if (user.role === 'AGENCY') { %>
+                        <p class="text-gray-600">You can manage your agency's subscriptions and view user subscriptions.</p>
+                    <% } else if (user.role === 'ADMIN_AGENCY') { %>
+                        <p class="text-gray-600">You can manage agency-specific settings and subscriptions.</p>
+                    <% } else { %>
+                        <p class="text-gray-600">You can manage your personal contacts and contact tags.</p>
+                    <% } %>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Quick Stats</h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p>📊 Dashboard Overview</p>
+                        <p>🕐 Last Login: <%= user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never' %></p>
+                        <p>📅 Member since: <%= new Date(user.created_at).toLocaleDateString() %></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>
+</html> 
