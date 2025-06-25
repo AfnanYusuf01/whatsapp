@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import generalRoutes from './routes/web.js';
+import apiRoutes from './routes/api.js';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.set('views', './src/views');
 
 // Routes
 app.use('/', generalRoutes);
+app.use('/api', apiRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

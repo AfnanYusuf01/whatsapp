@@ -9,6 +9,7 @@ import * as contactController from '../controllers/contactController.js';
 import * as contactTagController from '../controllers/contactTagController.js';
 import * as subscriptionController from '../controllers/subscriptionController.js';
 import * as userSubscriptionController from '../controllers/userSubscriptionController.js';
+import * as deviceController from '../controllers/deviceController.js';
 
 const router = express.Router();
 
@@ -73,6 +74,9 @@ router.get('/dashboard/user-subscriptions/:id', verifyToken, userSubscriptionCon
 router.get('/dashboard/user-subscriptions/:id/edit', verifyToken, userSubscriptionController.edit);
 router.post('/dashboard/user-subscriptions/:id', verifyToken, userSubscriptionController.update);
 router.post('/dashboard/user-subscriptions/:id/delete', verifyToken, userSubscriptionController.destroy);
+
+// Device Management routes
+router.get('/dashboard/devices', verifyToken, deviceController.index);
 
 // Redirect root to dashboard if authenticated, otherwise to login
 router.get('/', (req, res) => {

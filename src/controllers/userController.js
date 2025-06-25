@@ -75,6 +75,14 @@ export const store = async (req, res) => {
   try {
     const { username, full_name, email, password, role, is_active } = req.body;
 
+    // Validate required fields
+    if (!password || password.trim() === '') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Password is required' 
+      });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -121,6 +129,14 @@ export const update = async (req, res) => {
     const { id } = req.params;
     const { username, full_name, email, password, role, is_active } = req.body;
 
+    // Validate required fields
+    if (!password || password.trim() === '') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Password is required' 
+      });
+    }
+
     const updateData = {
       username,
       full_name,
@@ -130,10 +146,8 @@ export const update = async (req, res) => {
       updated_at: new Date()
     };
 
-    // Only update password if provided
-    if (password && password.trim() !== '') {
-      updateData.password = await bcrypt.hash(password, 12);
-    }
+    // Hash and update password
+    updateData.password = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.update({
       where: { id },

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Add Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Add QR Code library -->
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
+  <style>
+    .device-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .device-header {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .form-control-sm {
+      font-size: 0.9rem;
+    }
+    .navbar {
+      margin-bottom: 2rem;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <span class="navbar-brand"><%= title %></span>
+      <div class="d-flex align-items-center">
+        <span class="me-3">Welcome, <%= user.full_name %></span>
+        <a href="/dashboard" class="btn btn-secondary me-2">Dashboard</a>
+        <a href="/logout" class="btn btn-danger">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Create Device Section -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="bi bi-plus-circle"></i> Create New Device
+            </h5>
+          </div>
+          <div class="card-body">
+            <form id="createDeviceForm">
+              <div class="mb-3">
+                <label for="alias" class="form-label">Device Alias</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="alias"
+                  name="alias"
+                  placeholder="Enter device name (e.g., My WhatsApp Device)"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-plus"></i> Create Device
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="bi bi-info-circle"></i> Instructions
+            </h5>
+          </div>
+          <div class="card-body">
+            <ol>
+              <li>Enter a device alias/name</li>
+              <li>Click "Create Device"</li>
+              <li>Scan the QR code with WhatsApp</li>
+              <li>Wait for connection confirmation</li>
+            </ol>
+            <div class="alert alert-info mt-3">
+              <i class="bi bi-lightbulb"></i>
+              <strong>Tip:</strong> Use descriptive names like "Home Device" or "Office WhatsApp"
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="mb-4">Daftar Device Anda</h2>
+    <div id="deviceList"></div>
+  </div>
+
+  <!-- QR Modal -->
+  <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="qrModalLabel">
+            <i class="bi bi-qr-code"></i> Scan QR Code
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="qrModalCloseBtn"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div id="modalQrContainer">
+            <div id="modalQrCode"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" id="reloadQrBtn">
+            <i class="bi bi-arrow-clockwise"></i> Reload QR
+          </button>
+          <button type="button" class="btn btn-danger" id="cancelQrBtn">
+            <i class="bi bi-x-circle"></i> Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add QR Code library -->
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
+  <!-- Add Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- JS Section -->
+  <script>
+        // Global variables
+    let currentDeviceSession = null;
+    let deviceWs = null;
+    let deviceReconnectAttempts = 0;
+    const MAX_RECONNECT_ATTEMPTS = 5;
+    
+    const API_TOKEN = 'test123';
+    const API_BASE_URL = '/api/whatsapp';
+    const WS_BASE_URL = 'ws://localhost:3001';
+    const USER_ID = '<%= user.id %>';
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Device Management loaded');
+      
+      // Event listeners
+      document.getElementById('createDeviceForm').addEventListener('submit', createDevice);
+      document.getElementById('qrModalCloseBtn').addEventListener('click', handleQRCancel);
+      document.getElementById('cancelQrBtn').addEventListener('click', handleQRCancel);
+      document.getElementById('reloadQrBtn').addEventListener('click', handleQRReload);
+      
+      const qrModal = document.getElementById('qrModal');
+      qrModal.addEventListener('hidden.bs.modal', handleQRCancel);
+
+      // Initial fetch
+      fetchDevices();
+    });
+
+    // Fetch devices from API
+    async function fetchDevices() {
+      try {
+        const response = await fetch(API_BASE_URL + '/devices', {
+        headers: {
+          'X-API-Token': API_TOKEN
+        }
+      });
+        const result = await response.json();
+
+        if (!result.success) {
+          document.getElementById('deviceList').innerHTML = '<div class="alert alert-danger">Gagal memuat device.</div>';
+          return;
+        }
+
+        const devices = result.data.devices || [];
+        const container = document.getElementById('deviceList');
+        container.innerHTML = '';
+
+        if (devices.length === 0) {
+          container.innerHTML = '<div class="alert alert-info">Belum ada device. Silakan buat device baru di atas.</div>';
+          return;
+        }
+
+        devices.forEach(device => {
+          const card = document.createElement('div');
+          card.classList.add('device-card');
+
+          const statusBadge = getStatusBadge(device.status);
+          const statusEmoji = getStatusEmoji(device.status);
+
+          let qrButton = '';
+          if (device.status !== 'connected') {
+            qrButton = '<button type="button" class="btn btn-warning btn-sm" onclick="showQRModal(\'' + device.id + '\', \'' + device.sessionId + '\', \'' + device.alias + '\')">' +
+                      '<i class="bi bi-qr-code"></i> Show QR</button>';
+          }
+
+          card.innerHTML = 
+            '<div class="device-header">' +
+              statusEmoji + ' ' + device.alias + ' ' + (device.phoneNumber ? '(' + device.phoneNumber + ')' : '') +
+              '<span class="badge ' + statusBadge + ' ms-2">' + device.status + '</span>' +
+            '</div>' +
+            '<p><strong>Session ID:</strong> ' + (device.sessionId || 'N/A') + '</p>' +
+            '<p><strong>AI Enabled:</strong> ' + (device.aiEnabled ? 'Yes' : 'No') + '</p>' +
+            '<form onsubmit="return saveAISettings(event, \'' + device.id + '\')">' +
+              '<div class="row mb-2">' +
+                '<div class="col-md-4">' +
+                  '<label class="form-label">AI Enabled</label>' +
+                  '<select class="form-control form-control-sm" name="aiEnabled">' +
+                    '<option value="true"' + (device.aiEnabled ? ' selected' : '') + '>True</option>' +
+                    '<option value="false"' + (!device.aiEnabled ? ' selected' : '') + '>False</option>' +
+                  '</select>' +
+                '</div>' +
+                '<div class="col-md-4">' +
+                  '<label class="form-label">AI Language</label>' +
+                  '<input type="text" class="form-control form-control-sm" name="aiLanguage" value="' + (device.aiLanguage || 'en') + '">' +
+                '</div>' +
+                '<div class="col-md-4">' +
+                  '<label class="form-label">AI Bot Name</label>' +
+                  '<input type="text" class="form-control form-control-sm" name="aiBotName" value="' + (device.aiBotName || 'Assistant') + '">' +
+                '</div>' +
+              '</div>' +
+              '<div class="btn-group w-100" role="group">' +
+                '<button type="submit" class="btn btn-success btn-sm">' +
+                  '<i class="bi bi-gear"></i> Update AI Settings' +
+                '</button>' +
+                qrButton +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="deleteDevice(\'' + device.id + '\')">' +
+                  '<i class="bi bi-trash"></i> Delete' +
+                '</button>' +
+              '</div>' +
+            '</form>';
+
+          container.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+        console.error('Fetch error details:', {
+          message: error.message,
+          response: error.response
+        });
+        
+        let errorMessage = 'Failed to load devices: ' + error.message;
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Cannot connect to API server. Please check if the server is running on port 5000.';
+        }
+        
+        document.getElementById('deviceList').innerHTML = 
+          '<div class="alert alert-danger">' + 
+            '<strong>Error:</strong> ' + errorMessage + 
+          '</div>';
+      }
+    }
+
+    // Create new device
+    async function createDevice(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const alias = formData.get('alias');
+
+              console.log('Creating device with:', { userId: USER_ID, alias, token: API_TOKEN, url: API_BASE_URL });
+
+      try {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+
+        const requestBody = {
+          userId: USER_ID,
+          alias: alias
+        };
+        
+        console.log('Request body:', requestBody);
+        console.log('API URL:', API_BASE_URL + '/devices');
+
+        const response = await fetch(API_BASE_URL + '/devices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Token': API_TOKEN
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('Full API response:', result);
+        console.log('Response structure check:', {
+          hasData: !!result.data,
+          hasDevice: !!(result.data && result.data.device),
+          hasQR: !!(result.data && result.data.qr),
+          directDevice: !!result.device,
+          directQR: !!result.qr
+        });
+
+        console.log('Device created successfully:', result);
+        form.reset();
+        
+        // Handle QR code display (following contoh.ejs pattern)
+        // Support both response formats: result.data.device or result.device
+        const device = result.data?.device || result.device;
+        const qrCode = result.data?.qr || result.qr;
+        
+        if (device && device.sessionId) {
+          currentDeviceSession = device.sessionId;
+
+                      // Show QR modal first (loading state)
+            console.log('Showing QR modal for new device:', device);
+            showQRModalForNewDevice(device, null);
+
+          // Connect to device-specific WebSocket for real-time QR codes
+          connectDeviceWebSocket(device.sessionId);
+
+          console.log('Device created, connecting to device WebSocket for QR codes...', {
+            sessionId: device.sessionId
+          });
+
+          // If QR is immediately available in response, show it
+          if (qrCode) {
+            showQRModalForNewDevice(device, qrCode);
+            console.log('QR code received immediately', {
+              sessionId: device.sessionId
+            });
+          }
+        } else {
+          console.error('No device or sessionId in response:', result);
+          alert('Device created but no session information received. Please refresh the page.');
+        }
+
+        // Refresh device list
+        fetchDevices();
+
+      } catch (error) {
+        console.error('Error creating device:', error);
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          response: error.response
+        });
+        
+        let errorMessage = error.message;
+        if (error.message.includes('HTTP 500')) {
+          errorMessage = 'Server error: Please check if WhatsApp API service is running on port 3001';
+        } else if (error.message.includes('HTTP 503')) {
+          errorMessage = 'WhatsApp API service unavailable. Please check if the service is running.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Network error: Cannot connect to API server. Please check if the server is running.';
+        }
+        
+        alert('Error creating device: ' + errorMessage);
+      } finally {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-plus"></i> Create Device';
+      }
+    }
+
+    // Show QR Modal for new device (following contoh.ejs pattern)
+    async function showQRModalForNewDevice(device, immediateQR = null) {
+      const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+      const qrContainer = document.getElementById('modalQrContainer');
+      const reloadBtn = document.getElementById('reloadQrBtn');
+
+      // Store current session for reload functionality
+      reloadBtn.dataset.deviceId = device.id;
+      reloadBtn.dataset.sessionId = device.sessionId;
+
+      modal.show();
+
+      if (immediateQR) {
+        // Display immediate QR code from API response
+        qrContainer.innerHTML = 
+          '<div class="text-center">' +
+            '<p class="text-success"><i class="bi bi-wifi"></i> Device Created Successfully</p>' +
+            '<p>Scan this QR code with WhatsApp</p>' +
+            '<img src="data:image/png;base64,' + immediateQR + '" class="img-fluid" style="max-width: 300px;" />' +
+            '<p class="text-muted mt-2">Session: ' + device.sessionId + '</p>' +
+            '<small class="text-info">QR code received immediately</small>' +
+          '</div>';
+        console.log('QR code displayed for session:', device.sessionId);
+      } else {
+        // Show loading state and wait for WebSocket or fetch from API
+        qrContainer.innerHTML = 
+          '<div class="text-center">' +
+            '<div class="spinner-border text-primary" role="status">' +
+              '<span class="visually-hidden">Loading QR Code...</span>' +
+            '</div>' +
+            '<p class="mt-2">Waiting for QR code...</p>' +
+          '</div>';
+
+        try {
+          const response = await fetch(API_BASE_URL + '/devices/' + device.id + '/qr', {
+            headers: { 
+              'X-API-Token': API_TOKEN 
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.qrCode) {
+              qrContainer.innerHTML = 
+                '<div class="text-center">' +
+                  '<p>Scan this QR code with WhatsApp</p>' +
+                  '<img src="' + data.qrCode + '" class="img-fluid" style="max-width: 300px;" />' +
+                  '<p class="text-muted mt-2">Session: ' + device.sessionId + '</p>' +
+                '</div>';
+              console.log('QR code loaded for session:', device.sessionId);
+            } else {
+              qrContainer.innerHTML = 
+                '<div class="alert alert-warning">QR code not available. Device may already be connected.</div>';
+            }
+          } else {
+            qrContainer.innerHTML = 
+              '<div class="text-center">' +
+                '<div class="spinner-border text-primary mb-3" role="status">' +
+                  '<span class="visually-hidden">Waiting for QR Code...</span>' +
+                '</div>' +
+                '<p>Waiting for QR code via WebSocket...</p>' +
+                '<p class="text-muted">Session: ' + device.sessionId + '</p>' +
+                '<small class="text-info">Using WebSocket connection</small>' +
+              '</div>';
+          }
+        } catch (error) {
+          console.error('Failed to load QR code:', error.message);
+          qrContainer.innerHTML = 
+            '<div class="text-center">' +
+              '<div class="spinner-border text-primary mb-3" role="status">' +
+                '<span class="visually-hidden">Waiting for QR Code...</span>' +
+              '</div>' +
+              '<p>Waiting for QR code via WebSocket...</p>' +
+              '<p class="text-muted">Session: ' + device.sessionId + '</p>' +
+              '<small class="text-info">Using WebSocket connection</small>' +
+            '</div>';
+        }
+      }
+    }
+
+    // Show QR Modal for existing device
+    function showQRModal(deviceId, sessionId, alias) {
+      const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+      const qrContainer = document.getElementById('modalQrContainer');
+      
+      currentDeviceSession = sessionId;
+      modal.show();
+
+      qrContainer.innerHTML = 
+        '<div class="text-center">' +
+          '<div class="spinner-border text-primary mb-3" role="status">' +
+            '<span class="visually-hidden">Loading QR Code...</span>' +
+          '</div>' +
+          '<p>Loading QR code for ' + alias + '...</p>' +
+        '</div>';
+
+      // Connect WebSocket for QR updates
+      connectDeviceWebSocket(sessionId);
+    }
+
+    // Update QR Modal with WebSocket data (following contoh.ejs pattern)
+    function updateQRModalWithWebSocketData(data) {
+      const qrContainer = document.getElementById('modalQrContainer');
+
+      if (data.qr) {
+        // Use QRCode library to generate QR code from text data
+        qrContainer.innerHTML = 
+          '<div class="text-center">' +
+            '<p>Scan this QR code with WhatsApp</p>' +
+            '<div id="modalQrCodeCanvas" style="display: inline-block;"></div>' +
+            '<p class="text-muted mt-2">Session: ' + data.sessionId + '</p>' +
+            '<p class="text-success"><i class="bi bi-wifi"></i> Connected via Device WebSocket</p>' +
+          '</div>';
+
+        // Generate QR code using QRCode library
+        const generateQR = () => {
+          if (typeof QRCode !== 'undefined') {
+            try {
+              const qrDiv = document.getElementById('modalQrCodeCanvas');
+              qrDiv.innerHTML = ''; // Clear previous QR code
+              new QRCode(qrDiv, {
+                text: data.qr,
+                width: 300,
+                height: 300,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+              });
+              console.log('QR code generated for session:', data.sessionId);
+            } catch (error) {
+              console.error('Error generating QR code:', error);
+              qrContainer.innerHTML = 
+                '<div class="alert alert-danger text-center">' +
+                  '<p>Error generating QR code</p>' +
+                  '<small>' + error.message + '</small>' +
+                '</div>';
+            }
+          } else {
+            console.log('QRCode library not ready, retrying...');
+            setTimeout(generateQR, 100);
+          }
+        };
+        generateQR();
+
+        console.log('QR code received via Device WebSocket:', data.sessionId);
+      } else {
+        qrContainer.innerHTML = 
+          '<div class="alert alert-warning text-center">' +
+            '<p>QR code not available</p>' +
+            '<p class="text-muted">Session: ' + data.sessionId + '</p>' +
+          '</div>';
+      }
+    }
+
+    // WebSocket connection for real-time QR updates
+    function connectDeviceWebSocket(sessionId) {
+      if (deviceWs) {
+        console.log('Closing existing WebSocket');
+        deviceWs.close();
+      }
+
+      const wsUrl = WS_BASE_URL + '?token=' + API_TOKEN;
+      console.log('Connecting to WebSocket:', wsUrl);
+      
+      deviceWs = new WebSocket(wsUrl);
+
+      deviceWs.onopen = () => {
+        console.log('WebSocket connected for session:', sessionId);
+        deviceReconnectAttempts = 0;
+
+        // Subscribe to session
+        const subscribeMessage = {
+          type: 'subscribe',
+          sessionId: sessionId
+        };
+        deviceWs.send(JSON.stringify(subscribeMessage));
+        console.log('Subscribed to session:', sessionId);
+      };
+
+      deviceWs.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('WebSocket message:', data);
+
+          if (data.sessionId === currentDeviceSession) {
+            switch (data.type) {
+              case 'qr':
+                if (data.qr) {
+                  updateQRModalWithWebSocketData(data);
+                }
+                break;
+              case 'connection':
+              case 'connected':
+              case 'session_update':
+                console.log('Device connection status:', data.status || data.type);
+                if (data.status === 'connected' || data.type === 'connected') {
+                  // Hide QR modal when device connects
+                  hideQRModal();
+                  currentDeviceSession = null;
+                  console.log('Device connected successfully');
+                  // Close device WebSocket
+                  if (deviceWs) {
+                    deviceWs.close();
+                    deviceWs = null;
+                  }
+                  // Refresh sessions list
+                  fetchDevices();
+                  alert('Device connected successfully!');
+                } else if (data.status) {
+                  // Handle other status updates (connecting, pending, etc.)
+                  console.log('Device status:', data.status, { sessionId: data.sessionId });
+                }
+                break;
+              case 'message':
+                console.log('New message received', data.message);
+                break;
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+
+      deviceWs.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason);
+        
+        if (event.code !== 1000 && currentDeviceSession === sessionId && deviceReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+          deviceReconnectAttempts++;
+          const delay = Math.min(1000 * Math.pow(2, deviceReconnectAttempts), 30000);
+          setTimeout(() => connectDeviceWebSocket(sessionId), delay);
+        }
+      };
+
+      deviceWs.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+    }
+
+    // QR Modal handlers
+    function handleQRReload() {
+      const deviceId = document.getElementById('reloadQrBtn').dataset.deviceId;
+      const sessionId = document.getElementById('reloadQrBtn').dataset.sessionId;
+
+      if (deviceId && sessionId) {
+        const qrContainer = document.getElementById('modalQrContainer');
+        qrContainer.innerHTML = 
+          '<div class="text-center">' +
+            '<div class="spinner-border text-primary" role="status">' +
+              '<span class="visually-hidden">Reloading QR Code...</span>' +
+            '</div>' +
+            '<p>Reloading QR code...</p>' +
+          '</div>';
+
+        // Reconnect WebSocket
+        connectDeviceWebSocket(sessionId);
+      }
+    }
+
+    function handleQRCancel() {
+      if (currentDeviceSession) {
+        console.log('Cancelling session:', currentDeviceSession);
+        
+        if (deviceWs && deviceWs.readyState === WebSocket.OPEN) {
+          deviceWs.close(1000, 'User cancelled');
+          deviceWs = null;
+        }
+        
+        currentDeviceSession = null;
+      }
+
+      const modal = bootstrap.Modal.getInstance(document.getElementById('qrModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
+
+    function hideQRModal() {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('qrModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
+
+    // AI Settings functions
+    async function saveAISettings(event, deviceId) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const payload = {
+        aiEnabled: formData.get('aiEnabled') === 'true',
+        aiLanguage: formData.get('aiLanguage'),
+        aiBotName: formData.get('aiBotName')
+      };
+
+      try {
+        const response = await fetch(API_BASE_URL + '/devices/' + deviceId + '/settings/ai', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Token': API_TOKEN
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert('AI settings updated successfully!');
+          fetchDevices(); // Refresh to show updated data
+        } else {
+          alert('Failed to update AI settings: ' + (result.error || 'Unknown error'));
+        }
+
+      } catch (error) {
+        console.error('Error updating AI settings:', error);
+        alert('Error updating AI settings: ' + error.message);
+      }
+    }
+
+    // Delete device function
+    async function deleteDevice(deviceId) {
+      if (!confirm('Are you sure you want to delete this device? This action cannot be undone.')) return;
+
+      try {
+        const response = await fetch(API_BASE_URL + '/devices/' + deviceId, {
+          method: 'DELETE',
+          headers: {
+            'X-API-Token': API_TOKEN
+          }
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert('Device deleted successfully!');
+          fetchDevices(); // Refresh list
+        } else {
+          alert('Failed to delete device: ' + (result.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error deleting device:', error);
+        alert('Error deleting device: ' + error.message);
+      }
+    }
+
+    // Utility functions
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'connected': return 'bg-success';
+        case 'pending': return 'bg-warning';
+        case 'connecting': return 'bg-info';
+        case 'disconnected': return 'bg-danger';
+        case 'error': return 'bg-danger';
+        default: return 'bg-secondary';
+      }
+    }
+
+    function getStatusEmoji(status) {
+      switch (status) {
+        case 'connected': return '🟢';
+        case 'pending': return '🟡';
+        case 'connecting': return '🔄';
+        case 'disconnected': return '🔴';
+        case 'error': return '❌';
+        default: return '⚫';
+      }
+    }
+  </script>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
