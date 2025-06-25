@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import fileUpload from 'express-fileupload';
 import dotenv from 'dotenv';
 import generalRoutes from './routes/web.js';
 import apiRoutes from './routes/api.js';
@@ -14,6 +15,11 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  abortOnLimit: true,
+  createParentPath: true
+}));
 
 // View engine setup
 app.set('view engine', 'ejs');

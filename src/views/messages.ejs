@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .message-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .message.incoming {
+            background-color: #e3f2fd;
+            margin-right: 20%;
+        }
+        .message.outgoing {
+            background-color: #e8f5e9;
+            margin-left: 20%;
+        }
+        .session-status-ready {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+        }
+        .session-status-not-ready {
+            background-color: #fff3cd !important;
+            border-color: #ffeaa7 !important;
+        }
+        #sessionStatusIndicator {
+            padding: 8px 12px;
+            border-radius: 0.375rem;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="bi bi-whatsapp"></i> WhatsApp Management
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3">
+                        <i class="bi bi-chat-dots text-success"></i>
+                        Send Messages
+                    </h1>
+                    <a href="/dashboard" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Send Messages Form -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-send"></i> Send Message</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="sendMessageForm">
+                            <!-- Session Selector -->
+                            <div class="mb-3">
+                                <label for="sessionSelect" class="form-label">Select Device Session</label>
+                                <select class="form-control" id="sessionSelect" name="sessionId" required>
+                                    <option value="">Choose a session...</option>
+                                </select>
+                                <!-- Session Status Indicator -->
+                                <div id="sessionStatusIndicator" class="mt-2" style="display: none">
+                                    <div id="sessionStatusBadge" class="d-flex align-items-center">
+                                        <span id="sessionStatusIcon" class="me-2"></span>
+                                        <span id="sessionStatusText" class="small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="recipient" class="form-label">Recipient Phone Number</label>
+                                <input type="text" class="form-control" id="recipient" name="recipient" required>
+                                <small class="text-muted">Format: Country code without + (e.g., 628123456789)</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100" disabled>
+                                <i class="bi bi-send"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message History -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history"></i> Recent Messages
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="messageHistory" class="message-container">
+                            <div class="text-muted">No messages yet. Send a message to see history.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div id="statusMessages"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentSessionId = null;
+        const API_BASE_URL = '/api';
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUserDevices();
+            
+            // Session selector change handler
+            document.getElementById('sessionSelect').addEventListener('change', function (e) {
+                currentSessionId = e.target.value;
+                const sendButton = document.querySelector('#sendMessageForm button[type="submit"]');
+                
+                // Get the selected option to check its status
+                const selectedOption = e.target.selectedOptions[0];
+                const sessionStatus = selectedOption?.dataset.status;
+                const isReady = selectedOption?.dataset.isReady === 'true';
+
+                // Enable button only if session is selected and ready
+                sendButton.disabled = !currentSessionId || !isReady;
+
+                // Update button text and title based on status
+                if (currentSessionId) {
+                    // Show status indicator
+                    const statusIndicator = document.getElementById('sessionStatusIndicator');
+                    const statusIcon = document.getElementById('sessionStatusIcon');
+                    const statusText = document.getElementById('sessionStatusText');
+
+                    statusIndicator.style.display = 'block';
+                    statusIcon.textContent = getStatusEmoji(sessionStatus);
+
+                    if (isReady) {
+                        sendButton.innerHTML = '<i class="bi bi-send"></i> Send Message';
+                        sendButton.title = 'Ready to send messages';
+                        sendButton.className = 'btn btn-success w-100';
+                        statusText.innerHTML = '<span class="text-success"><strong>Ready to send messages</strong> - Session is connected</span>';
+                        
+                        // Apply ready styles to session selector
+                        document.getElementById('sessionSelect').className = 'form-control session-status-ready';
+                        
+                        addStatusMessage('success', `Session ready for messaging: ${currentSessionId} [${sessionStatus}]`);
+                    } else {
+                        sendButton.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Session Not Ready [${sessionStatus?.toUpperCase()}]`;
+                        sendButton.title = `Cannot send messages - Session status: ${sessionStatus}. Please wait for connection or scan QR code.`;
+                        sendButton.className = 'btn btn-warning w-100';
+
+                        // Provide specific status messages
+                        let statusMessage = '';
+                        switch (sessionStatus) {
+                            case 'pending':
+                                statusMessage = 'Waiting for QR code scan - Please scan the QR code with WhatsApp';
+                                break;
+                            case 'connecting':
+                                statusMessage = 'Connecting to WhatsApp - Please wait...';
+                                break;
+                            case 'disconnected':
+                                statusMessage = 'Disconnected - Please reconnect the session';
+                                break;
+                            case 'logged_out':
+                                statusMessage = 'Logged out - Please login again';
+                                break;
+                            case 'error':
+                                statusMessage = 'Error occurred - Please check the session';
+                                break;
+                            default:
+                                statusMessage = `Status: ${sessionStatus} - Cannot send messages`;
+                        }
+                        statusText.innerHTML = `<span class="text-warning"><strong>Cannot send messages</strong> - ${statusMessage}</span>`;
+
+                        // Apply not-ready styles to session selector
+                        document.getElementById('sessionSelect').className = 'form-control session-status-not-ready';
+                        
+                        addStatusMessage('warning', `Session not ready for messaging: ${currentSessionId} [${sessionStatus}]`);
+                    }
+                } else {
+                    // Hide status indicator when no session selected
+                    document.getElementById('sessionStatusIndicator').style.display = 'none';
+                    sendButton.innerHTML = '<i class="bi bi-send"></i> Send Message';
+                    sendButton.title = 'Select a session first';
+                    sendButton.className = 'btn btn-success w-100';
+
+                    // Reset session selector styling
+                    document.getElementById('sessionSelect').className = 'form-control';
+                }
+            });
+
+            // Form submission handler
+            document.getElementById('sendMessageForm').addEventListener('submit', sendMessage);
+        });
+
+        // Load user devices
+        async function loadUserDevices() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/whatsapp/devices`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || 'Failed to fetch devices');
+                }
+
+                const sessionSelect = document.getElementById('sessionSelect');
+                
+                // Clear existing options
+                while (sessionSelect.options.length > 1) {
+                    sessionSelect.remove(1);
+                }
+
+                if (data.data && data.data.devices && data.data.devices.length > 0) {
+                    data.data.devices.forEach((device) => {
+                        // Create status emoji and text
+                        const statusEmoji = getStatusEmoji(device.status);
+                        const statusText = device.status.toUpperCase();
+
+                        // Create option with status information
+                        const optionText = `${statusEmoji} ${device.userId} - ${device.alias} [${statusText}]`;
+                        const option = new Option(optionText, device.sessionId);
+
+                        // Add data attributes for status checking
+                        option.dataset.deviceId = device.id;
+                        option.dataset.status = device.status;
+                        option.dataset.isReady = device.status === 'connected' ? 'true' : 'false';
+
+                        // Style non-connected options differently
+                        if (device.status !== 'connected') {
+                            option.style.color = '#6c757d';
+                            option.style.fontStyle = 'italic';
+                        }
+
+                        sessionSelect.add(option);
+                    });
+
+                    addStatusMessage('success', `Loaded ${data.data.devices.length} devices`);
+                } else {
+                    addStatusMessage('info', 'No devices found. Please create a device first.');
+                }
+            } catch (error) {
+                console.error('Error loading devices:', error);
+                addStatusMessage('error', `Failed to load devices: ${error.message}`);
+            }
+        }
+
+        // Send message function
+        async function sendMessage(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const recipient = formData.get('recipient');
+            const sessionId = formData.get('sessionId');
+            const message = formData.get('message');
+
+            if (!sessionId) {
+                addStatusMessage('error', 'Please select a session');
+                return;
+            }
+
+            // Check if the selected session is ready for messaging
+            const sessionSelect = document.getElementById('sessionSelect');
+            const selectedOption = sessionSelect.selectedOptions[0];
+            const sessionStatus = selectedOption?.dataset.status;
+            const isReady = selectedOption?.dataset.isReady === 'true';
+
+            if (!isReady) {
+                const statusMessage = sessionStatus ? ` (Status: ${sessionStatus})` : '';
+                addStatusMessage('error', `Cannot send message - Session is not connected${statusMessage}. Please wait for the session to connect or scan the QR code.`);
+                return;
+            }
+
+            try {
+                form.querySelector('button[type="submit"]').disabled = true;
+                form.querySelector('button[type="submit"]').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+                const response = await fetch(`${API_BASE_URL}/whatsapp/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sessionId,
+                        recipient,
+                        message
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to send message');
+                }
+
+                addStatusMessage('success', 'Message sent successfully!');
+                
+                // Reset form
+                form.reset();
+                document.getElementById('sessionSelect').dispatchEvent(new Event('change'));
+
+                // Update message history
+                loadMessageHistory(sessionId);
+            } catch (error) {
+                addStatusMessage('error', `Error sending message: ${error.message}`);
+            } finally {
+                form.querySelector('button[type="submit"]').disabled = false;
+                form.querySelector('button[type="submit"]').innerHTML = '<i class="bi bi-send"></i> Send Message';
+            }
+        }
+
+        // Load message history
+        async function loadMessageHistory(sessionId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/whatsapp/messages?sessionId=${sessionId}&limit=10`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const historyContainer = document.getElementById('messageHistory');
+
+                // Handle the API response structure
+                const messages = data.data?.messages || data.messages || [];
+
+                if (messages.length > 0) {
+                    historyContainer.innerHTML = messages
+                        .map((msg) => `
+                            <div class="mb-2 p-2 border rounded ${msg.direction === 'outgoing' ? 'bg-light' : ''}">
+                                <small class="text-muted">${new Date(msg.timestamp).toLocaleString()}</small>
+                                <div><strong>${msg.direction === 'outgoing' ? 'Sent to' : 'From'}:</strong> ${msg.recipient || msg.from}</div>
+                                <div>${msg.message || msg.caption || '[Media]'}</div>
+                            </div>
+                        `)
+                        .join('');
+                } else {
+                    historyContainer.innerHTML = '<div class="text-muted">No messages found</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load message history:', error);
+                document.getElementById('messageHistory').innerHTML = '<div class="text-muted">Failed to load message history</div>';
+            }
+        }
+
+        // Helper function to get status emoji
+        function getStatusEmoji(status) {
+            switch (status) {
+                case 'connected':
+                    return '🟢';
+                case 'pending':
+                    return '🟡';
+                case 'connecting':
+                    return '🔄';
+                case 'disconnected':
+                    return '🔴';
+                case 'error':
+                    return '❌';
+                case 'auth_failed':
+                    return '🚫';
+                case 'logged_out':
+                    return '⚪';
+                case 'reconnecting':
+                    return '🔄';
+                default:
+                    return '⚫';
+            }
+        }
+
+        // Add status message
+        function addStatusMessage(type, message) {
+            const statusContainer = document.getElementById('statusMessages');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            statusContainer.appendChild(alertDiv);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 

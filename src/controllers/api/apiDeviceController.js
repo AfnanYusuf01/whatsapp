@@ -303,3 +303,53 @@ export const createDevice = async (req, res) => {
     }
   };
   
+
+  export const getBusinessTypes = async (req, res) => {
+    try {
+      const response = await axios.get(`${WHATSAPP_API_BASE_URL}/api/business-templates/types`, {
+        headers: {
+          'Accept': '*/*',
+          'Accept-Language': 'en-GB,en;q=0.9,ar;q=0.8,id;q=0.7',
+          'Connection': 'keep-alive',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
+          'X-API-Token': WHATSAPP_API_TOKEN,
+          'DNT': '1'
+        },
+        withCredentials: true,
+        timeout: 30000
+      });
+  
+      res.json({
+        success: true,
+        message: 'Business template types retrieved successfully',
+        data: response.data,
+        timestamp: new Date().toISOString()
+      });
+  
+    } catch (error) {
+      console.error('Error fetching business types:', error);
+  
+      if (error.response) {
+        return res.status(error.response.status).json({
+          success: false,
+          message: 'Error from WhatsApp API',
+          error: error.response.data
+        });
+      }
+  
+      if (error.request) {
+        return res.status(503).json({
+          success: false,
+          message: 'Network error',
+          error: 'No response received'
+        });
+      }
+  
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  };
+  

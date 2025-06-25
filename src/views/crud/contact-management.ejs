@@ -34,9 +34,17 @@
             <!-- Header with Create Button -->
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold">Contact Management</h2>
-                <button onclick="openCreateModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    + Create Contact
-                </button>
+                <div class="flex space-x-3">
+                    <button onclick="downloadTemplate()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        📥 Download Template
+                    </button>
+                    <button onclick="openImportModal()" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                        📤 Import CSV
+                    </button>
+                    <button onclick="openCreateModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        + Create Contact
+                    </button>
+                </div>
             </div>
 
             <!-- Alert Messages -->
@@ -172,6 +180,72 @@
         </div>
     </div>
 
+    <!-- Import CSV Modal -->
+    <div id="import-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Import Contacts from CSV</h3>
+                
+                <!-- Instructions -->
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                    <h4 class="font-semibold text-blue-800 mb-2">📋 Instructions:</h4>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• Download the template first to see the correct format</li>
+                        <li>• <strong>Required fields:</strong> name, phone</li>
+                        <li>• <strong>Optional fields:</strong> email, notes, tag_name</li>
+                        <li>• <strong>Phone format:</strong> Use international format (e.g., 628123456789)</li>
+                        <li>• <strong>Tag handling:</strong> Tags will be created automatically if they don't exist</li>
+                        <li>• <strong>File size:</strong> Maximum 5MB</li>
+                        <li>• <strong>Encoding:</strong> Use UTF-8 encoding for proper character support</li>
+                    </ul>
+                </div>
+
+                <!-- CSV Format Example -->
+                <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">📄 CSV Format Example:</h4>
+                    <div class="bg-white border rounded p-3 text-sm font-mono">
+                        name,phone,email,notes,tag_name<br>
+                        John Doe,628123456789,john@example.com,Important client,Client<br>
+                        Jane Smith,628987654321,jane@example.com,Regular contact,Partner
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <form id="import-form" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select CSV File</label>
+                        <input type="file" id="csv-file" name="csv_file" accept=".csv" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div id="csv-preview" class="mb-4 hidden">
+                        <h4 class="font-semibold text-gray-800 mb-2">📊 Preview (First 5 rows):</h4>
+                        <div class="bg-gray-50 border rounded-md p-3 max-h-40 overflow-y-auto">
+                            <div id="preview-content" class="text-sm font-mono"></div>
+                        </div>
+                    </div>
+
+                    <!-- Import Options -->
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="skip-duplicates" name="skip_duplicates" class="mr-2">
+                            <span class="text-sm text-gray-700">Skip duplicate contacts (based on phone number)</span>
+                        </label>
+                    </div>
+
+                    <div class="flex justify-end mt-6 space-x-3">
+                        <button type="button" onclick="closeImportModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                            Cancel
+                        </button>
+                        <button type="submit" id="import-btn" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                            Import Contacts
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         let isEdit = false;
 
@@ -192,14 +266,18 @@
                 .then(data => {
                     if (data.contact) {
                         const contact = data.contact;
+                        console.log('Contact data for editing:', contact);
+                        
                         document.getElementById('contact-id').value = contact.id;
-                        document.getElementById('name').value = contact.name;
-                        document.getElementById('phone').value = contact.phone;
+                        document.getElementById('name').value = contact.name || '';
+                        document.getElementById('phone').value = contact.phone || '';
                         document.getElementById('email').value = contact.email || '';
                         document.getElementById('notes').value = contact.notes || '';
                         document.getElementById('tag_id').value = contact.tag_id || '';
                         
                         document.getElementById('contact-modal').classList.remove('hidden');
+                    } else {
+                        showAlert('Contact not found', 'error');
                     }
                 })
                 .catch(error => {
@@ -263,6 +341,10 @@
             document.getElementById('view-modal').classList.add('hidden');
         }
 
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.add('hidden');
+        }
+
         function showAlert(message, type) {
             const alertContainer = document.getElementById('alert-container');
             const alertClass = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
@@ -285,15 +367,29 @@
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
             
+            // Debug: Log the form data
+            console.log('Form data before sending:', data);
+            console.log('Is edit mode:', isEdit);
+            
             const url = isEdit ? `/dashboard/contacts/${data.contact_id}` : '/dashboard/contacts';
             const method = 'POST';
+            
+            // Clean up the data - remove empty strings and convert to proper types
+            const cleanedData = {};
+            Object.keys(data).forEach(key => {
+                if (data[key] !== '' && data[key] !== undefined) {
+                    cleanedData[key] = data[key];
+                }
+            });
+            
+            console.log('Cleaned data:', cleanedData);
             
             fetch(url, {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(cleanedData)
             })
             .then(response => response.json())
             .then(data => {
@@ -313,6 +409,156 @@
                 showAlert('Error saving contact', 'error');
             });
         });
+
+        function downloadTemplate() {
+            // Create CSV template content with better examples
+            const csvContent = `name,phone,email,notes,tag_name
+John Doe,628123456789,john@example.com,Important client for project A,Client
+Jane Smith,628987654321,jane@example.com,Regular contact - monthly meeting,Partner
+Bob Johnson,628555123456,bob@example.com,New vendor contact,Vendor
+Sarah Wilson,628111222333,sarah@example.com,Marketing team contact,Marketing
+Mike Brown,628444555666,mike@example.com,Technical support contact,Support`;
+
+            // Create blob and download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'contacts_template.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function openImportModal() {
+            document.getElementById('import-modal').classList.remove('hidden');
+            document.getElementById('import-form').reset();
+            document.getElementById('csv-preview').classList.add('hidden');
+        }
+
+        // CSV file preview
+        document.getElementById('csv-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert('File size too large. Maximum size is 5MB.', 'error');
+                    this.value = '';
+                    return;
+                }
+
+                // Validate file type
+                if (!file.name.endsWith('.csv') && file.type !== 'text/csv') {
+                    showAlert('Please select a valid CSV file.', 'error');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csvContent = e.target.result;
+                    const lines = csvContent.split('\n').slice(0, 6); // First 6 lines (header + 5 data rows)
+                    const previewContent = lines.map(line => line.replace(/,/g, ' | ')).join('\n');
+                    
+                    document.getElementById('preview-content').textContent = previewContent;
+                    document.getElementById('csv-preview').classList.remove('hidden');
+                };
+                reader.onerror = function() {
+                    showAlert('Error reading file. Please try again.', 'error');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Import form submission
+        document.getElementById('import-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const importBtn = document.getElementById('import-btn');
+            const originalText = importBtn.textContent;
+            
+            // Show loading state
+            importBtn.disabled = true;
+            importBtn.textContent = 'Importing...';
+            
+            fetch('/dashboard/contacts/import', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(`Successfully imported ${data.imported_count} contacts! ${data.skipped_count > 0 ? `Skipped ${data.skipped_count} duplicates.` : ''}`, 'success');
+                    closeImportModal();
+                    
+                    // Update contacts list without page refresh
+                    if (data.imported_count > 0) {
+                        updateContactsList();
+                    }
+                } else {
+                    showAlert(data.message || 'Import failed', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error importing contacts', 'error');
+            })
+            .finally(() => {
+                importBtn.disabled = false;
+                importBtn.textContent = originalText;
+            });
+        });
+
+        // Function to update contacts list without page refresh
+        function updateContactsList() {
+            fetch('/dashboard/contacts')
+                .then(response => response.text())
+                .then(html => {
+                    // Create a temporary div to parse the HTML
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    
+                    // Extract the contacts table body
+                    const newTableBody = tempDiv.querySelector('#contacts-table-body');
+                    const currentTableBody = document.getElementById('contacts-table-body');
+                    
+                    if (newTableBody && currentTableBody) {
+                        currentTableBody.innerHTML = newTableBody.innerHTML;
+                    }
+                    
+                    // Update empty state if needed
+                    const newEmptyState = tempDiv.querySelector('.text-center.py-12');
+                    const currentEmptyState = document.querySelector('.text-center.py-12');
+                    
+                    if (newEmptyState && currentEmptyState) {
+                        currentEmptyState.innerHTML = newEmptyState.innerHTML;
+                    } else if (newEmptyState && !currentEmptyState) {
+                        // If there was no empty state before, replace the table
+                        const tableContainer = document.querySelector('.bg-white.shadow.overflow-hidden.sm\\:rounded-md');
+                        if (tableContainer) {
+                            tableContainer.innerHTML = newEmptyState.outerHTML;
+                        }
+                    } else if (!newEmptyState && currentEmptyState) {
+                        // If there's no empty state now, replace with table
+                        const tableContainer = document.querySelector('.bg-white.shadow.overflow-hidden.sm\\:rounded-md');
+                        if (tableContainer) {
+                            const newTable = tempDiv.querySelector('.bg-white.shadow.overflow-hidden.sm\\:rounded-md');
+                            if (newTable) {
+                                tableContainer.innerHTML = newTable.innerHTML;
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating contacts list:', error);
+                    // Fallback to page refresh if update fails
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                });
+        }
     </script>
 </body>
 </html> 

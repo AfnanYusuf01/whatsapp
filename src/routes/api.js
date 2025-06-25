@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { listSessions, getUserDevices, deleteUserDevice, getAISettings, updateAISettings, createDevice } from '../controllers/apiDeviceController.js';
+import { listSessions, getUserDevices, deleteUserDevice, getAISettings, updateAISettings, createDevice, getBusinessTypes } from '../controllers/api/apiDeviceController.js';
+import { sendMessage, getMessages } from '../controllers/api/apiMessageController.js';
 
 const router = express.Router();
 
@@ -55,8 +56,8 @@ router.delete('/whatsapp/devices/:id', deleteUserDevice);
 router.put('/whatsapp/devices/:id/settings/ai', updateAISettings);
 router.post('/whatsapp/devices', createDevice);
 router.get('/whatsapp/devices/:id/settings/ai', getAISettings);
-
-
-
+router.get('/business-templates/types', getBusinessTypes);
+router.post('/whatsapp/send', sendMessage);
+router.get('/whatsapp/messages', getMessages);
 
 export default router; 

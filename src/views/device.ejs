@@ -66,6 +66,17 @@
                   required
                 />
               </div>
+              <div class="mb-3">
+                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  placeholder="Enter phone number (e.g., +6281234567890)"
+                />
+                <small class="text-muted">Optional: Enter the phone number for this device</small>
+              </div>
               <button type="submit" class="btn btn-primary w-100">
                 <i class="bi bi-plus"></i> Create Device
               </button>
@@ -206,34 +217,15 @@
             '</div>' +
             '<p><strong>Session ID:</strong> ' + (device.sessionId || 'N/A') + '</p>' +
             '<p><strong>AI Enabled:</strong> ' + (device.aiEnabled ? 'Yes' : 'No') + '</p>' +
-            '<form onsubmit="return saveAISettings(event, \'' + device.id + '\')">' +
-              '<div class="row mb-2">' +
-                '<div class="col-md-4">' +
-                  '<label class="form-label">AI Enabled</label>' +
-                  '<select class="form-control form-control-sm" name="aiEnabled">' +
-                    '<option value="true"' + (device.aiEnabled ? ' selected' : '') + '>True</option>' +
-                    '<option value="false"' + (!device.aiEnabled ? ' selected' : '') + '>False</option>' +
-                  '</select>' +
-                '</div>' +
-                '<div class="col-md-4">' +
-                  '<label class="form-label">AI Language</label>' +
-                  '<input type="text" class="form-control form-control-sm" name="aiLanguage" value="' + (device.aiLanguage || 'en') + '">' +
-                '</div>' +
-                '<div class="col-md-4">' +
-                  '<label class="form-label">AI Bot Name</label>' +
-                  '<input type="text" class="form-control form-control-sm" name="aiBotName" value="' + (device.aiBotName || 'Assistant') + '">' +
-                '</div>' +
-              '</div>' +
-              '<div class="btn-group w-100" role="group">' +
-                '<button type="submit" class="btn btn-success btn-sm">' +
-                  '<i class="bi bi-gear"></i> Update AI Settings' +
-                '</button>' +
-                qrButton +
-                '<button type="button" class="btn btn-danger btn-sm" onclick="deleteDevice(\'' + device.id + '\')">' +
-                  '<i class="bi bi-trash"></i> Delete' +
-                '</button>' +
-              '</div>' +
-            '</form>';
+            '<div class="btn-group w-100" role="group">' +
+              '<a href="/dashboard/devices/' + device.id + '/settings" class="btn btn-info btn-sm">' +
+                '<i class="bi bi-sliders"></i> Settings' +
+              '</a>' +
+              qrButton +
+              '<button type="button" class="btn btn-danger btn-sm" onclick="deleteDevice(\'' + device.id + '\')">' +
+                '<i class="bi bi-trash"></i> Delete' +
+              '</button>' +
+            '</div>';
 
           container.appendChild(card);
         });
@@ -263,8 +255,9 @@
       const form = e.target;
       const formData = new FormData(form);
       const alias = formData.get('alias');
+      const phoneNumber = formData.get('phoneNumber');
 
-              console.log('Creating device with:', { userId: USER_ID, alias, token: API_TOKEN, url: API_BASE_URL });
+      console.log('Creating device with:', { userId: USER_ID, alias, phoneNumber, token: API_TOKEN, url: API_BASE_URL });
 
       try {
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -273,7 +266,8 @@
 
         const requestBody = {
           userId: USER_ID,
-          alias: alias
+          alias: alias,
+          phoneNumber: phoneNumber || null
         };
         
         console.log('Request body:', requestBody);
@@ -648,42 +642,6 @@
       const modal = bootstrap.Modal.getInstance(document.getElementById('qrModal'));
       if (modal) {
         modal.hide();
-      }
-    }
-
-    // AI Settings functions
-    async function saveAISettings(event, deviceId) {
-      event.preventDefault();
-      const form = event.target;
-      const formData = new FormData(form);
-
-      const payload = {
-        aiEnabled: formData.get('aiEnabled') === 'true',
-        aiLanguage: formData.get('aiLanguage'),
-        aiBotName: formData.get('aiBotName')
-      };
-
-      try {
-        const response = await fetch(API_BASE_URL + '/devices/' + deviceId + '/settings/ai', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-API-Token': API_TOKEN
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          alert('AI settings updated successfully!');
-          fetchDevices(); // Refresh to show updated data
-        } else {
-          alert('Failed to update AI settings: ' + (result.error || 'Unknown error'));
-        }
-
-      } catch (error) {
-        console.error('Error updating AI settings:', error);
-        alert('Error updating AI settings: ' + error.message);
       }
     }
 

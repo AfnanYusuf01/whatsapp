@@ -43,6 +43,7 @@ router.post('/dashboard/agencies/:id/delete', verifyToken, agencyController.dest
 router.get('/dashboard/contacts', verifyToken, contactController.index);
 router.get('/dashboard/contacts/create', verifyToken, contactController.create);
 router.post('/dashboard/contacts', verifyToken, contactController.store);
+router.post('/dashboard/contacts/import', verifyToken, contactController.importCSV);
 router.get('/dashboard/contacts/:id', verifyToken, contactController.show);
 router.get('/dashboard/contacts/:id/edit', verifyToken, contactController.edit);
 router.post('/dashboard/contacts/:id', verifyToken, contactController.update);
@@ -77,6 +78,10 @@ router.post('/dashboard/user-subscriptions/:id/delete', verifyToken, userSubscri
 
 // Device Management routes
 router.get('/dashboard/devices', verifyToken, deviceController.index);
+router.get('/dashboard/devices/:id/settings', verifyToken, deviceController.showSettings);
+
+// Message Management routes
+router.get('/dashboard/messages', verifyToken, deviceController.showMessages);
 
 // Redirect root to dashboard if authenticated, otherwise to login
 router.get('/', (req, res) => {

@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Device Settings - <%= title %></title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+      .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      }
+      .navbar-brand {
+        font-weight: 600;
+      }
+      .status-connected {
+        color: #198754;
+      }
+      .status-disconnected {
+        color: #dc3545;
+      }
+      .settings-section {
+        margin-bottom: 2rem;
+      }
+      .device-info {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="/dashboard">
+          <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+        <span class="navbar-text text-white">Device Settings</span>
+        <div class="d-flex align-items-center">
+          <span class="text-white me-3">Welcome, <%= user.full_name %></span>
+          <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <!-- Device Info -->
+      <div class="device-info">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h4><i class="bi bi-phone"></i> Device Settings</h4>
+            <p class="mb-0">Device ID: <strong><%= deviceId %></strong></p>
+            <small>Configure AI settings and business intelligence for this device</small>
+          </div>
+          <div class="col-md-4 text-end">
+            <a href="/dashboard/devices" class="btn btn-outline-light">
+              <i class="bi bi-arrow-left"></i> Back to Devices
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="ai-settings-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#ai-settings"
+            type="button"
+            role="tab"
+          >
+            🤖 AI Settings
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="business-config-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#business-config"
+            type="button"
+            role="tab"
+          >
+            💼 Business Config
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="testing-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#testing"
+            type="button"
+            role="tab"
+          >
+            🧪 Testing
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content" id="settingsTabContent">
+        <!-- AI Settings Tab -->
+        <div class="tab-pane fade show active" id="ai-settings" role="tabpanel">
+          <form id="aiSettingsForm">
+            <div class="card settings-section">
+              <div class="card-header">
+                <h5 class="mb-0">🤖 AI Configuration</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="aiEnabled"
+                        name="aiEnabled"
+                      />
+                      <label class="form-check-label" for="aiEnabled"
+                        >Enable AI Assistant</label
+                      >
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="aiAutoReply"
+                        name="aiAutoReply"
+                      />
+                      <label class="form-check-label" for="aiAutoReply"
+                        >Auto Reply</label
+                      >
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="aiTriggerRequired"
+                        name="aiTriggerRequired"
+                      />
+                      <label class="form-check-label" for="aiTriggerRequired"
+                        >Require Triggers
+                        <small class="text-muted"
+                          >(If off, AI responds to any message)</small
+                        ></label
+                      >
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="conversationMemoryEnabled"
+                        name="conversationMemoryEnabled"
+                      />
+                      <label
+                        class="form-check-label"
+                        for="conversationMemoryEnabled"
+                        >Conversation Memory</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="aiBotName" class="form-label">Bot Name</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="aiBotName"
+                        name="aiBotName"
+                        placeholder="Assistant"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="aiLanguage" class="form-label"
+                        >Primary Language</label
+                      >
+                      <select
+                        class="form-select"
+                        id="aiLanguage"
+                        name="aiLanguage"
+                      >
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="en">English</option>
+                        <option value="ms">Bahasa Melayu</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="aiPromptTemplate" class="form-label"
+                    >System Prompt</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="aiPromptTemplate"
+                    name="aiPromptTemplate"
+                    rows="4"
+                    placeholder="You are a helpful AI assistant..."
+                  ></textarea>
+                </div>
+
+                <div class="mb-3">
+                  <label for="aiTriggers" class="form-label"
+                    >Trigger Words</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="aiTriggers"
+                    name="aiTriggers"
+                    placeholder="@help, @support, @ai"
+                  />
+                  <small class="text-muted"
+                    >Comma-separated trigger words</small
+                  >
+                </div>
+
+                <div class="mb-3">
+                  <label for="aiRules" class="form-label">AI Rules</label>
+                  <textarea
+                    class="form-control"
+                    id="aiRules"
+                    name="aiRules"
+                    rows="3"
+                    placeholder="- Always be polite&#10;- Provide accurate information&#10;- Escalate complex issues"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Provider Settings -->
+            <div class="card settings-section">
+              <div class="card-header">
+                <h5 class="mb-0">🔀 AI Provider Configuration</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="aiProvider" class="form-label"
+                        >Primary AI Provider</label
+                      >
+                      <select
+                        class="form-select"
+                        id="aiProvider"
+                        name="aiProvider"
+                      >
+                        <option value="openai">🤖 OpenAI (GPT-3.5/4)</option>
+                        <option value="deepseek">
+                          💰 DeepSeek (90% cheaper)
+                        </option>
+                        <option value="claude">🎯 Claude (High quality)</option>
+                        <option value="gemini">
+                          📚 Gemini (Large context)
+                        </option>
+                        <option value="groq">⚡ Groq (Ultra-fast)</option>
+                      </select>
+                      <small class="text-muted"
+                        >Primary provider for AI responses</small
+                      >
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="aiFallbackProvider" class="form-label"
+                        >Fallback Provider</label
+                      >
+                      <select
+                        class="form-select"
+                        id="aiFallbackProvider"
+                        name="aiFallbackProvider"
+                      >
+                        <option value="">No fallback</option>
+                        <option value="openai">🤖 OpenAI</option>
+                        <option value="deepseek">💰 DeepSeek</option>
+                        <option value="claude">🎯 Claude</option>
+                        <option value="gemini">📚 Gemini</option>
+                        <option value="groq">⚡ Groq</option>
+                      </select>
+                      <small class="text-muted">Backup if primary fails</small>
+                    </div>
+
+                    <div class="mb-3" id="aiModelSection">
+                      <label for="aiModel" class="form-label">AI Model</label>
+                      <select class="form-select" id="aiModel" name="aiModel">
+                        <option value="">Use provider default</option>
+                      </select>
+                      <small class="text-muted"
+                        >Available models for selected provider</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="aiTemperature" class="form-label"
+                        >🎨 Creativity (Temperature)</label
+                      >
+                      <div class="row">
+                        <div class="col-8">
+                          <input
+                            type="range"
+                            class="form-range"
+                            id="aiTemperatureRange"
+                            min="0"
+                            max="2"
+                            step="0.1"
+                            value="0.7"
+                            oninput="updateTemperatureValue(this.value)"
+                          />
+                        </div>
+                        <div class="col-4">
+                          <input
+                            type="number"
+                            class="form-control form-control-sm"
+                            id="aiTemperature"
+                            name="aiTemperature"
+                            min="0"
+                            max="2"
+                            step="0.1"
+                            value="0.7"
+                            onchange="updateTemperatureRange(this.value)"
+                          />
+                        </div>
+                      </div>
+                      <small class="text-muted">
+                        <span class="badge bg-primary">0.0-0.3</span> Focused
+                        <span class="badge bg-info">0.4-0.7</span> Balanced
+                        <span class="badge bg-warning">0.8-2.0</span> Creative
+                      </small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="aiMaxTokens" class="form-label"
+                        >📏 Response Length</label
+                      >
+                      <select
+                        class="form-select"
+                        id="aiMaxTokens"
+                        name="aiMaxTokens"
+                      >
+                        <option value="150">🔸 Short (150 tokens)</option>
+                        <option value="300">🔹 Medium (300 tokens)</option>
+                        <option value="500" selected>
+                          🔶 Standard (500 tokens)
+                        </option>
+                        <option value="1000">🔷 Long (1000 tokens)</option>
+                        <option value="2000">🔸 Very Long (2000 tokens)</option>
+                      </select>
+                      <small class="text-muted"
+                        >Longer responses cost more</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card bg-light">
+                      <div class="card-body py-2">
+                        <h6 class="card-title mb-2">💡 Provider Comparison</h6>
+                        <div class="row small">
+                          <div class="col-md-2">
+                            <strong>DeepSeek:</strong> $0.0001/1K tokens
+                          </div>
+                          <div class="col-md-2">
+                            <strong>OpenAI:</strong> $0.0015/1K tokens
+                          </div>
+                          <div class="col-md-2">
+                            <strong>Claude:</strong> $0.003/1K tokens
+                          </div>
+                          <div class="col-md-3">
+                            <strong>Groq:</strong> $0.0001/1K tokens (fast)
+                          </div>
+                          <div class="col-md-3">
+                            <strong>Gemini:</strong> $0.0001/1K tokens (large
+                            context)
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                💾 Save AI Settings
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Business Configuration Tab -->
+        <div class="tab-pane fade" id="business-config" role="tabpanel">
+          <form id="businessConfigForm">
+            <div class="card settings-section">
+              <div class="card-header">
+                <h5 class="mb-0">💼 Business Intelligence</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="businessType" class="form-label"
+                        >Business Type</label
+                      >
+                      <select
+                        class="form-select"
+                        id="businessType"
+                        name="businessType"
+                      >
+                        <option value="">Loading business types...</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="businessLanguage" class="form-label"
+                        >Template Language</label
+                      >
+                      <select
+                        class="form-select"
+                        id="businessLanguage"
+                        name="businessLanguage"
+                      >
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="en">English</option>
+                        <option value="ms">Bahasa Melayu</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Template Actions</label>
+                      <div class="d-grid gap-2">
+                        <button
+                          type="button"
+                          class="btn btn-outline-primary"
+                          id="loadBusinessTemplate"
+                        >
+                          🔄 Load Business Template
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-info btn-sm"
+                          id="previewTemplate"
+                        >
+                          👁️ Preview Template
+                        </button>
+                        <div id="templateStatus" class="text-muted small">
+                          Select business type to load template
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="productKnowledge" class="form-label"
+                    >Product Knowledge Base</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="productKnowledge"
+                    name="productKnowledge"
+                    rows="5"
+                    placeholder="Product catalog, pricing, inventory, specifications..."
+                  ></textarea>
+                  <small class="text-muted"
+                    >Detailed product information, pricing, and policies</small
+                  >
+                </div>
+
+                <div class="mb-3">
+                  <label for="salesScripts" class="form-label"
+                    >Sales Scripts & Responses</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="salesScripts"
+                    name="salesScripts"
+                    rows="5"
+                    placeholder="Sales scripts, greetings, objection handling..."
+                  ></textarea>
+                  <small class="text-muted"
+                    >Sales strategies, greetings, and closing techniques</small
+                  >
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="upsellStrategies" class="form-label"
+                        >Upsell Strategies</label
+                      >
+                      <textarea
+                        class="form-control"
+                        id="upsellStrategies"
+                        name="upsellStrategies"
+                        rows="3"
+                        placeholder="Cross-selling and upselling techniques..."
+                      ></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="objectionHandling" class="form-label"
+                        >Objection Handling</label
+                      >
+                      <textarea
+                        class="form-control"
+                        id="objectionHandling"
+                        name="objectionHandling"
+                        rows="3"
+                        placeholder="Common objections and responses..."
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-success">
+                    💾 Save Business Configuration
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Testing Tab -->
+        <div class="tab-pane fade" id="testing" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">🧪 AI Response Testing</h5>
+            </div>
+            <div class="card-body">
+              <form id="aiTestForm">
+                <div class="mb-3">
+                  <label for="testMessage" class="form-label"
+                    >Test Message</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="testMessage"
+                    name="testMessage"
+                    rows="3"
+                    placeholder="Type a message to test AI response..."
+                  ></textarea>
+                </div>
+                <div class="mb-3">
+                  <button type="submit" class="btn btn-primary">
+                    🔮 Test AI Response
+                  </button>
+                </div>
+                <div id="testResult" class="mt-3"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // Configuration
+      const API_BASE_URL = "/api/whatsapp";
+      const BUSINESS_API_URL = "/api/business-templates";
+      const API_TOKEN = "test123";
+      const DEVICE_ID = "<%= deviceId %>";
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", function () {
+        loadDeviceAI();
+        loadBusinessTypes();
+        initializeProviderModels();
+
+        // Event listeners
+        document
+          .getElementById("businessType")
+          .addEventListener("change", onBusinessTypeChange);
+        document
+          .getElementById("businessLanguage")
+          .addEventListener("change", onBusinessTypeChange);
+        document
+          .getElementById("loadBusinessTemplate")
+          .addEventListener("click", loadSelectedTemplate);
+        document
+          .getElementById("previewTemplate")
+          .addEventListener("click", previewSelectedTemplate);
+        document
+          .getElementById("aiSettingsForm")
+          .addEventListener("submit", updateDeviceAI);
+        document
+          .getElementById("businessConfigForm")
+          .addEventListener("submit", saveBusinessConfig);
+        document
+          .getElementById("aiTestForm")
+          .addEventListener("submit", testAIResponse);
+        document
+          .getElementById("aiProvider")
+          .addEventListener("change", onProviderChange);
+      });
+
+      // Load available business types
+      async function loadBusinessTypes() {
+        try {
+          const response = await fetch(`${BUSINESS_API_URL}/types`);
+          const data = await response.json();
+
+          if (data.success) {
+            const select = document.getElementById("businessType");
+            select.innerHTML =
+              '<option value="">Select business type...</option>';
+
+            data.businessTypes.forEach((type) => {
+              const option = document.createElement("option");
+              option.value = type;
+              option.textContent = formatBusinessType(type);
+              select.appendChild(option);
+            });
+          }
+        } catch (error) {
+          console.error("Failed to load business types:", error);
+        }
+      }
+
+      // Format business type for display
+      function formatBusinessType(type) {
+        const types = {
+          ecommerce: "🛒 E-commerce",
+          restaurant: "🍕 Restaurant",
+          healthcare: "🏥 Healthcare",
+          education: "📚 Education",
+          "real-estate": "🏠 Real Estate",
+          travel: "✈️ Travel",
+          automotive: "🚗 Automotive",
+          finance: "💰 Finance",
+          beauty: "💄 Beauty",
+        };
+        return types[type] || type.charAt(0).toUpperCase() + type.slice(1);
+      }
+
+      // Load business template
+      async function loadSelectedTemplate() {
+        const businessType = document.getElementById("businessType").value;
+        const language = document.getElementById("businessLanguage").value;
+
+        if (!businessType) {
+          document.getElementById("templateStatus").textContent =
+            "Please select a business type first";
+          return;
+        }
+
+        try {
+          document.getElementById("templateStatus").textContent =
+            "Loading template...";
+          const response = await fetch(
+            `${BUSINESS_API_URL}/${businessType}/${language}`
+          );
+          const data = await response.json();
+
+          if (data.success && data.template) {
+            const template = data.template;
+
+            // Fill form fields with template data
+            document.getElementById("aiBotName").value = template.botName || "";
+            document.getElementById("aiPromptTemplate").value =
+              template.prompt || "";
+            document.getElementById("productKnowledge").value =
+              template.productKnowledge || "";
+            document.getElementById("salesScripts").value =
+              template.salesScripts || "";
+            document.getElementById("aiRules").value =
+              template.businessRules || "";
+            document.getElementById("aiTriggers").value =
+              template.triggers || "";
+
+            // Fill additional template fields if they exist
+            if (document.getElementById("upsellStrategies")) {
+              document.getElementById("upsellStrategies").value =
+                typeof template.upsellStrategies === "object"
+                  ? Object.entries(template.upsellStrategies || {})
+                      .map(([key, value]) => `${key}: ${value}`)
+                      .join("\n")
+                  : template.upsellStrategies || "";
+            }
+            if (document.getElementById("objectionHandling")) {
+              document.getElementById("objectionHandling").value =
+                typeof template.objectionHandling === "object"
+                  ? Object.entries(template.objectionHandling || {})
+                      .map(([key, value]) => `${key}: ${value}`)
+                      .join("\n")
+                  : template.objectionHandling || "";
+            }
+
+            document.getElementById("templateStatus").innerHTML = `
+              <span class="text-success">✅ Template loaded successfully!</span><br>
+              <small>${formatBusinessType(businessType)} - ${getLanguageName(
+              language
+            )}</small>
+            `;
+          } else {
+            document.getElementById("templateStatus").textContent =
+              "Template not found for this business type and language";
+          }
+        } catch (error) {
+          console.error("Failed to load template:", error);
+          document.getElementById("templateStatus").textContent =
+            "Failed to load template";
+        }
+      }
+
+      // Get language display name
+      function getLanguageName(code) {
+        const languages = {
+          id: "Bahasa Indonesia",
+          en: "English",
+          ms: "Bahasa Melayu",
+        };
+        return languages[code] || code;
+      }
+
+      // Preview selected template
+      async function previewSelectedTemplate() {
+        const businessType = document.getElementById("businessType").value;
+        const language = document.getElementById("businessLanguage").value;
+
+        if (!businessType) {
+          alert("Please select a business type first");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${BUSINESS_API_URL}/${businessType}/${language}`
+          );
+          const data = await response.json();
+
+          if (data.success && data.template) {
+            const template = data.template;
+            const previewHtml = `
+              <div class="modal fade" id="templatePreviewModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">📋 Template Preview</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <h6><strong>Business Type:</strong> ${formatBusinessType(
+                        businessType
+                      )}</h6>
+                      <h6><strong>Language:</strong> ${getLanguageName(
+                        language
+                      )}</h6>
+                      <hr>
+                      <h6>🤖 Bot Name:</h6>
+                      <p class="small">${
+                        template.botName || "Not specified"
+                      }</p>
+                      <h6>📝 Prompt:</h6>
+                      <p class="small">${(
+                        template.prompt || "Not specified"
+                      ).substring(0, 200)}${
+              template.prompt && template.prompt.length > 200 ? "..." : ""
+            }</p>
+                      <h6>📦 Product Knowledge:</h6>
+                      <p class="small">${(
+                        template.productKnowledge || "Not specified"
+                      ).substring(0, 200)}${
+              template.productKnowledge &&
+              template.productKnowledge.length > 200
+                ? "..."
+                : ""
+            }</p>
+                      <h6>💬 Sales Scripts:</h6>
+                      <p class="small">${(
+                        template.salesScripts || "Not specified"
+                      ).substring(0, 200)}${
+              template.salesScripts && template.salesScripts.length > 200
+                ? "..."
+                : ""
+            }</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="loadSelectedTemplate()">
+                        🔄 Load This Template
+                      </button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById(
+              "templatePreviewModal"
+            );
+            if (existingModal) {
+              existingModal.remove();
+            }
+
+            // Add modal to body
+            document.body.insertAdjacentHTML("beforeend", previewHtml);
+
+            // Show modal
+            const modal = new bootstrap.Modal(
+              document.getElementById("templatePreviewModal")
+            );
+            modal.show();
+          } else {
+            alert("Template not found for this business type and language");
+          }
+        } catch (error) {
+          console.error("Failed to preview template:", error);
+          alert("Failed to preview template");
+        }
+      }
+
+      // Handle business type change
+      function onBusinessTypeChange() {
+        document.getElementById("templateStatus").textContent =
+          "Click 'Load Business Template' to apply selected template";
+      }
+
+      // Load device AI settings
+      async function loadDeviceAI() {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/devices/${DEVICE_ID}/settings/ai`,
+            {
+              headers: { "X-API-Token": API_TOKEN },
+            }
+          );
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const result = await response.json();
+          console.log(result);
+          
+          // Extract data from the nested structure
+          const data = result.data || result;
+
+          // Populate form fields with proper boolean handling
+          document.getElementById("aiEnabled").checked = data.aiEnabled === true;
+          document.getElementById("aiAutoReply").checked = data.aiAutoReply === true;
+          document.getElementById("aiTriggerRequired").checked = data.aiTriggerRequired === true;
+          document.getElementById("conversationMemoryEnabled").checked = data.conversationMemoryEnabled === true;
+          
+          document.getElementById("aiBotName").value = data.aiBotName || "";
+          document.getElementById("aiLanguage").value = data.aiLanguage || "id";
+          document.getElementById("aiMaxTokens").value = data.aiMaxTokens || 500;
+          document.getElementById("aiTemperature").value = data.aiTemperature || 0.7;
+          document.getElementById("aiPromptTemplate").value = data.aiPromptTemplate || "";
+          document.getElementById("aiTriggers").value = data.aiTriggers
+            ? data.aiTriggers.join(", ")
+            : "";
+          document.getElementById("aiRules").value = data.aiRules
+            ? data.aiRules.join("\n")
+            : "";
+
+          // AI Provider settings
+          document.getElementById("aiProvider").value = data.aiProvider || "openai";
+          document.getElementById("aiFallbackProvider").value = data.aiFallbackProvider || "";
+
+          // Update models for current provider
+          onProviderChange();
+          setTimeout(() => {
+            document.getElementById("aiModel").value = data.aiModel || "";
+          }, 100);
+
+          // Update temperature controls
+          updateTemperatureValue(data.aiTemperature || 0.7);
+          updateTemperatureRange(data.aiTemperature || 0.7);
+
+          // Business fields
+          document.getElementById("productKnowledge").value = data.productKnowledge || "";
+          document.getElementById("salesScripts").value = data.salesScripts || "";
+          document.getElementById("businessType").value = data.businessType || "";
+
+          // Additional business fields
+          if (document.getElementById("upsellStrategies")) {
+            document.getElementById("upsellStrategies").value =
+              typeof data.upsellStrategies === "object"
+                ? Object.entries(data.upsellStrategies || {})
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join("\n")
+                : data.upsellStrategies || "";
+          }
+          if (document.getElementById("objectionHandling")) {
+            document.getElementById("objectionHandling").value =
+              typeof data.objectionHandling === "object"
+                ? Object.entries(data.objectionHandling || {})
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join("\n")
+                : data.objectionHandling || "";
+          }
+
+          console.log("✅ Device AI settings loaded");
+        } catch (error) {
+          console.error("Failed to load device AI settings:", error);
+        }
+      }
+
+      // Update device AI settings
+      async function updateDeviceAI(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        const settings = {
+          aiEnabled: formData.has("aiEnabled"),
+          aiAutoReply: formData.has("aiAutoReply"),
+          aiTriggerRequired: formData.has("aiTriggerRequired"),
+          conversationMemoryEnabled: formData.has("conversationMemoryEnabled"),
+          aiBotName: formData.get("aiBotName"),
+          aiLanguage: formData.get("aiLanguage"),
+          aiMaxTokens: parseInt(formData.get("aiMaxTokens")),
+          aiTemperature: parseFloat(formData.get("aiTemperature")),
+          aiPromptTemplate: formData.get("aiPromptTemplate"),
+          aiTriggers: formData
+            .get("aiTriggers")
+            .split(",")
+            .map((t) => t.trim())
+            .filter((t) => t),
+          aiRules: formData
+            .get("aiRules")
+            .split("\n")
+            .map((r) => r.trim())
+            .filter((r) => r),
+          // AI Provider settings
+          aiProvider: formData.get("aiProvider"),
+          aiFallbackProvider: formData.get("aiFallbackProvider"),
+          aiModel: formData.get("aiModel"),
+          productKnowledge: formData.get("productKnowledge"),
+          salesScripts: formData.get("salesScripts"),
+          businessType: formData.get("businessType"),
+          upsellStrategies:
+            document.getElementById("upsellStrategies")?.value || "",
+          objectionHandling:
+            document.getElementById("objectionHandling")?.value || "",
+        };
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/devices/${DEVICE_ID}/settings/ai`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "X-API-Token": API_TOKEN,
+              },
+              body: JSON.stringify(settings),
+            }
+          );
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const result = await response.json();
+          alert("✅ AI settings updated successfully!");
+          console.log("AI settings updated:", result);
+        } catch (error) {
+          console.error("Failed to update AI settings:", error);
+          alert("❌ Failed to update AI settings");
+        }
+      }
+
+      // Save business configuration
+      async function saveBusinessConfig(event) {
+        event.preventDefault();
+
+        const settings = {
+          productKnowledge: document.getElementById("productKnowledge").value,
+          salesScripts: document.getElementById("salesScripts").value,
+          businessType: document.getElementById("businessType").value,
+          upsellStrategies:
+            document.getElementById("upsellStrategies")?.value || "",
+          objectionHandling:
+            document.getElementById("objectionHandling")?.value || "",
+        };
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/devices/${DEVICE_ID}/settings/ai`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "X-API-Token": API_TOKEN,
+              },
+              body: JSON.stringify(settings),
+            }
+          );
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          alert("✅ Business configuration saved successfully!");
+        } catch (error) {
+          console.error("Failed to save business config:", error);
+          alert("❌ Failed to save business configuration");
+        }
+      }
+
+      // Test AI response
+      async function testAIResponse(event) {
+        event.preventDefault();
+
+        const message = document.getElementById("testMessage").value.trim();
+        if (!message) {
+          alert("Please enter a test message");
+          return;
+        }
+
+        const resultDiv = document.getElementById("testResult");
+        resultDiv.innerHTML =
+          '<div class="text-muted">🤖 Testing AI response...</div>';
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/test-ai`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-Token": API_TOKEN,
+            },
+            body: JSON.stringify({
+              deviceId: DEVICE_ID,
+              message: message,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+          }
+
+          const result = await response.json();
+
+          if (result.success && result.response) {
+            resultDiv.innerHTML = `
+              <div class="alert alert-success">
+                <h6>🤖 AI Response:</h6>
+                <p class="mb-2">${result.response}</p>
+                <small class="text-muted">
+                  <strong>Settings:</strong> ${result.settings.botName} | 
+                  Temp: ${result.settings.temperature} | 
+                  Tokens: ${result.settings.maxTokens} | 
+                  Lang: ${result.settings.language}
+                </small>
+              </div>
+            `;
+          } else {
+            resultDiv.innerHTML = `
+              <div class="alert alert-warning">
+                <h6>⚠️ No AI Response:</h6>
+                <p class="mb-0">${
+                  result.message || "AI did not generate a response"
+                }</p>
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error("Failed to test AI:", error);
+          resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+              <h6>❌ Error:</h6>
+              <p class="mb-0">${error.message}</p>
+              <small class="text-muted">Make sure the server is running and try restarting it to pick up route changes.</small>
+            </div>
+          `;
+        }
+      }
+
+      // AI Provider Models Configuration
+      const AI_MODELS = {
+        openai: [
+          { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo (Fast & Cheap)" },
+          { value: "gpt-4o-mini", label: "GPT-4o Mini (Better Quality)" },
+          { value: "gpt-4o", label: "GPT-4o (Best Quality)" },
+          { value: "gpt-4-turbo", label: "GPT-4 Turbo (Advanced)" },
+        ],
+        deepseek: [
+          { value: "deepseek-chat", label: "DeepSeek Chat (General)" },
+          { value: "deepseek-coder", label: "DeepSeek Coder (Programming)" },
+          { value: "deepseek-math", label: "DeepSeek Math (Mathematics)" },
+        ],
+        claude: [
+          {
+            value: "claude-3-5-sonnet-20241022",
+            label: "Claude 3.5 Sonnet (Latest)",
+          },
+          {
+            value: "claude-3-5-haiku-20241022",
+            label: "Claude 3.5 Haiku (Fast)",
+          },
+          { value: "claude-3-opus-20240229", label: "Claude 3 Opus (Premium)" },
+        ],
+        gemini: [
+          { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash (Fast)" },
+          { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro (Advanced)" },
+          { value: "gemini-pro", label: "Gemini Pro (Standard)" },
+        ],
+        groq: [
+          {
+            value: "llama-3.1-70b-versatile",
+            label: "Llama 3.1 70B (Versatile)",
+          },
+          { value: "llama-3.1-8b-instant", label: "Llama 3.1 8B (Ultra Fast)" },
+          {
+            value: "mixtral-8x7b-32768",
+            label: "Mixtral 8x7B (Large Context)",
+          },
+          { value: "gemma2-9b-it", label: "Gemma2 9B (Efficient)" },
+        ],
+      };
+
+      // Initialize provider models
+      function initializeProviderModels() {
+        onProviderChange(); // Load models for default provider
+      }
+
+      // Handle provider change
+      function onProviderChange() {
+        const provider = document.getElementById("aiProvider").value;
+        const modelSelect = document.getElementById("aiModel");
+
+        // Clear existing options
+        modelSelect.innerHTML =
+          '<option value="">Use provider default</option>';
+
+        if (provider && AI_MODELS[provider]) {
+          AI_MODELS[provider].forEach((model) => {
+            const option = document.createElement("option");
+            option.value = model.value;
+            option.textContent = model.label;
+            modelSelect.appendChild(option);
+          });
+        }
+      }
+
+      // Temperature control functions
+      function updateTemperatureValue(value) {
+        document.getElementById("aiTemperature").value = value;
+        document.getElementById("aiTemperatureRange").value = value;
+      }
+
+      function updateTemperatureRange(value) {
+        document.getElementById("aiTemperature").value = value;
+        document.getElementById("aiTemperatureRange").value = value;
+      }
+    </script>
+  </body>
+</html> 
