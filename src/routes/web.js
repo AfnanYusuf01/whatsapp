@@ -10,6 +10,8 @@ import * as contactTagController from '../controllers/contactTagController.js';
 import * as subscriptionController from '../controllers/subscriptionController.js';
 import * as userSubscriptionController from '../controllers/userSubscriptionController.js';
 import * as deviceController from '../controllers/deviceController.js';
+import * as messageController from '../controllers/messageController.js';
+import * as fileController from '../controllers/fileController.js';
 
 const router = express.Router();
 
@@ -81,7 +83,18 @@ router.get('/dashboard/devices', verifyToken, deviceController.index);
 router.get('/dashboard/devices/:id/settings', verifyToken, deviceController.showSettings);
 
 // Message Management routes
-router.get('/dashboard/messages', verifyToken, deviceController.showMessages);
+router.get('/dashboard/messages', verifyToken, messageController.index);
+
+// File Management routes
+router.get('/dashboard/files', verifyToken, fileController.index);
+
+// Warmer Service routes
+router.get('/dashboard/warmer', verifyToken, (req, res) => {
+  res.render('warmer', { 
+    title: 'WhatsApp Warmer Service',
+    user: req.user 
+  });
+});
 
 // Redirect root to dashboard if authenticated, otherwise to login
 router.get('/', (req, res) => {

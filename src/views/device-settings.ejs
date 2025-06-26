@@ -579,7 +579,7 @@
       // Configuration
       const API_BASE_URL = "/api/whatsapp";
       const BUSINESS_API_URL = "/api/business-templates";
-      const API_TOKEN = "test123";
+              const API_TOKEN = "<%= process.env.WHATSAPP_API_TOKEN || 'test123' %>";
       const DEVICE_ID = "<%= deviceId %>";
 
       // Initialize page

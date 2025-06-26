@@ -151,9 +151,9 @@
     let deviceReconnectAttempts = 0;
     const MAX_RECONNECT_ATTEMPTS = 5;
     
-    const API_TOKEN = 'test123';
+    const API_TOKEN = '<%= process.env.WHATSAPP_API_TOKEN || "test123" %>';
     const API_BASE_URL = '/api/whatsapp';
-    const WS_BASE_URL = 'ws://localhost:3001';
+    const WS_BASE_URL = '<%= (process.env.WHATSAPP_WS_URL || "ws://localhost:3001") %>';
     const USER_ID = '<%= user.id %>';
 
     // Initialize on page load
@@ -239,7 +239,7 @@
         
         let errorMessage = 'Failed to load devices: ' + error.message;
         if (error.message.includes('Failed to fetch')) {
-          errorMessage = 'Cannot connect to API server. Please check if the server is running on port 5000.';
+                          errorMessage = 'Cannot connect to API server. Please check if the server is running.';
         }
         
         document.getElementById('deviceList').innerHTML = 
@@ -347,7 +347,7 @@
         
         let errorMessage = error.message;
         if (error.message.includes('HTTP 500')) {
-          errorMessage = 'Server error: Please check if WhatsApp API service is running on port 3001';
+                          errorMessage = 'Server error: Please check if WhatsApp API service is running';
         } else if (error.message.includes('HTTP 503')) {
           errorMessage = 'WhatsApp API service unavailable. Please check if the service is running.';
         } else if (error.message.includes('Failed to fetch')) {

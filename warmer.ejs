@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp Warmer Service Testing</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .tabs {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #6c757d;
+        transition: all 0.3s ease;
+      }
+
+      .tab.active {
+        background: white;
+        color: #25d366;
+        border-bottom: 3px solid #25d366;
+      }
+
+      .tab:hover {
+        background: #e9ecef;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #25d366;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: transform 0.2s ease;
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn.secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+      }
+
+      .btn.danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      }
+
+      .card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid #25d366;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status.active {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.paused {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .status.stopped {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .response {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .response.success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+
+      .response.error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+
+      .conversation-step {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+      }
+
+      .conversation-step h4 {
+        color: #25d366;
+        margin-bottom: 10px;
+      }
+
+      .device-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .device-item {
+        background: #e9ecef;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .device-item:hover {
+        background: #25d366;
+        color: white;
+      }
+
+      .device-item.selected {
+        background: #25d366;
+        color: white;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #25d366;
+      }
+
+      .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🔥 WhatsApp Warmer Service</h1>
+        <p>Cross-Device Conversation Automation & Testing Interface</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="campaigns">📊 Campaigns</button>
+        <button class="tab" data-tab="templates">💬 Templates</button>
+        <button class="tab" data-tab="analytics">📈 Analytics</button>
+        <button class="tab" data-tab="devices">📱 Devices</button>
+      </div>
+
+      <div class="content">
+        <!-- User ID Input -->
+        <div class="form-group">
+          <label for="userId">User ID:</label>
+          <input
+            type="text"
+            id="userId"
+            value="01234567-89ab-cdef-0123-456789abcdef"
+            placeholder="Enter your user ID"
+          />
+        </div>
+
+        <!-- Campaigns Tab -->
+        <div id="campaigns" class="tab-content active">
+          <h2>Campaign Management</h2>
+
+          <div class="grid">
+            <div class="card">
+              <h3>Create New Campaign</h3>
+              <div class="form-group">
+                <label for="campaignName">Campaign Name:</label>
+                <input
+                  type="text"
+                  id="campaignName"
+                  placeholder="My Warmer Campaign"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="campaignDescription">Description:</label>
+                <textarea
+                  id="campaignDescription"
+                  rows="3"
+                  placeholder="Campaign description..."
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Selected Devices (click to select):</label>
+                <div id="deviceSelection" class="device-list">
+                  <div class="loading">Loading devices...</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Daily Message Settings:</label>
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
+                  "
+                >
+                  <div>
+                    <label>Week 1 (Min-Max):</label>
+                    <input
+                      type="text"
+                      id="week1"
+                      value="3-5"
+                      placeholder="3-5"
+                    />
+                  </div>
+                  <div>
+                    <label>Week 2 (Min-Max):</label>
+                    <input
+                      type="text"
+                      id="week2"
+                      value="5-8"
+                      placeholder="5-8"
+                    />
+                  </div>
+                  <div>
+                    <label>Week 3 (Min-Max):</label>
+                    <input
+                      type="text"
+                      id="week3"
+                      value="8-12"
+                      placeholder="8-12"
+                    />
+                  </div>
+                  <div>
+                    <label>Week 4+ (Min-Max):</label>
+                    <input
+                      type="text"
+                      id="week4"
+                      value="10-15"
+                      placeholder="10-15"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Working Hours:</label>
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
+                  "
+                >
+                  <div>
+                    <label>Start Time:</label>
+                    <input type="time" id="startTime" value="09:00" />
+                  </div>
+                  <div>
+                    <label>End Time:</label>
+                    <input type="time" id="endTime" value="17:00" />
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn" id="createCampaignBtn">
+                Create Campaign
+              </button>
+            </div>
+
+            <div class="card">
+              <h3>Existing Campaigns</h3>
+              <div id="campaignsList">
+                <div class="loading">Loading campaigns...</div>
+              </div>
+              <button class="btn secondary" id="refreshCampaignsBtn">
+                Refresh Campaigns
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates Tab -->
+        <div id="templates" class="tab-content">
+          <h2>Conversation Templates</h2>
+
+          <div class="grid">
+            <div class="card">
+              <h3>Create Template</h3>
+              <div class="form-group">
+                <label for="campaignSelect">Select Campaign:</label>
+                <select id="campaignSelect">
+                  <option value="">Select a campaign...</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="templateName">Template Name:</label>
+                <input
+                  type="text"
+                  id="templateName"
+                  placeholder="Morning Greeting"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="templateCategory">Category:</label>
+                <select id="templateCategory">
+                  <option value="greeting">Greeting</option>
+                  <option value="casual_chat">Casual Chat</option>
+                  <option value="business_talk">Business Talk</option>
+                  <option value="follow_up">Follow Up</option>
+                  <option value="question_answer">Q&A</option>
+                  <option value="sharing_update">Sharing Update</option>
+                  <option value="planning">Planning</option>
+                  <option value="random">Random</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Conversation Flow:</label>
+                <div id="conversationSteps">
+                  <div class="conversation-step">
+                    <h4>Step 1</h4>
+                    <textarea
+                      placeholder="Enter message content..."
+                      rows="2"
+                    ></textarea>
+                  </div>
+                </div>
+                <button class="btn secondary" id="addStepBtn">Add Step</button>
+              </div>
+
+              <button class="btn" id="createTemplateBtn">
+                Create Template
+              </button>
+            </div>
+
+            <div class="card">
+              <h3>Template Library</h3>
+              <div id="templatesList">
+                <div class="loading">Select a campaign to view templates</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+          <h2>Campaign Analytics</h2>
+
+          <div class="form-group">
+            <label for="analyticsSelect">Select Campaign:</label>
+            <select id="analyticsSelect">
+              <option value="">Select a campaign...</option>
+            </select>
+          </div>
+
+          <div id="analyticsData">
+            <div class="loading">Select a campaign to view analytics</div>
+          </div>
+        </div>
+
+        <!-- Devices Tab -->
+        <div id="devices" class="tab-content">
+          <h2>Available Devices</h2>
+          <div id="devicesList">
+            <div class="loading">Loading devices...</div>
+          </div>
+          <button class="btn secondary" id="refreshDevicesBtn">
+            Refresh Devices
+          </button>
+        </div>
+
+        <!-- Response Display -->
+        <div id="response" class="response" style="display: none"></div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "/api/warmer";
+      let selectedDevices = [];
+      let conversationStepCount = 1;
+
+      // Tab Management
+      function showTab(tabName, targetElement) {
+        // Hide all tab contents
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // Remove active class from all tabs
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        // Show selected tab content
+        document.getElementById(tabName).classList.add("active");
+
+        // Add active class to clicked tab
+        targetElement.classList.add("active");
+
+        // Load data for specific tabs
+        if (tabName === "campaigns") {
+          loadCampaigns();
+          loadDevices();
+        } else if (tabName === "templates") {
+          loadCampaignsForSelect();
+        } else if (tabName === "analytics") {
+          loadCampaignsForAnalytics();
+        } else if (tabName === "devices") {
+          loadDevices();
+        }
+      }
+
+      // Device Management
+      async function loadDevices() {
+        try {
+          const userId = document.getElementById("userId").value;
+          if (!userId) {
+            showResponse("Please enter a User ID", "error");
+            return;
+          }
+
+          const response = await fetch(`${API_BASE}/devices?userId=${userId}`);
+          const data = await response.json();
+
+          if (data.success) {
+            displayDevices(data.data);
+          } else {
+            showResponse(`Error loading devices: ${data.error}`, "error");
+          }
+        } catch (error) {
+          showResponse(`Error loading devices: ${error.message}`, "error");
+        }
+      }
+
+      function displayDevices(devices) {
+        const deviceSelection = document.getElementById("deviceSelection");
+        const devicesList = document.getElementById("devicesList");
+
+        if (devices.length === 0) {
+          deviceSelection.innerHTML =
+            '<div class="loading">No devices found</div>';
+          devicesList.innerHTML = '<div class="loading">No devices found</div>';
+          return;
+        }
+
+        // For device selection
+        deviceSelection.innerHTML = devices
+          .map(
+            (device) => `
+                <div class="device-item ${
+                  selectedDevices.includes(device.sessionId) ? "selected" : ""
+                }" 
+                     data-device-id="${device.sessionId}">
+                    ${device.alias || device.sessionId} 
+                    <span class="status ${device.status}">${
+              device.status
+            }</span>
+                </div>
+            `
+          )
+          .join("");
+
+        // Add event listeners to device items
+        deviceSelection.querySelectorAll(".device-item").forEach((item) => {
+          item.addEventListener("click", function () {
+            toggleDevice(this.dataset.deviceId);
+          });
+        });
+
+        // For devices list
+        devicesList.innerHTML = devices
+          .map(
+            (device) => `
+                <div class="card">
+                    <h4>${device.alias || device.sessionId}</h4>
+                    <p><strong>Status:</strong> <span class="status ${
+                      device.status
+                    }">${device.status}</span></p>
+                    <p><strong>Phone:</strong> ${
+                      device.phoneNumber || "Not set"
+                    }</p>
+                    <p><strong>Last Connection:</strong> ${
+                      device.lastConnection
+                        ? new Date(device.lastConnection).toLocaleString()
+                        : "Never"
+                    }</p>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function toggleDevice(sessionId) {
+        if (selectedDevices.includes(sessionId)) {
+          selectedDevices = selectedDevices.filter((id) => id !== sessionId);
+        } else {
+          selectedDevices.push(sessionId);
+        }
+
+        // Update display
+        document.querySelectorAll(".device-item").forEach((item) => {
+          const deviceId = item.dataset.deviceId;
+          if (deviceId === sessionId) {
+            item.classList.toggle("selected");
+          }
+        });
+      }
+
+      // Campaign Management
+      async function createCampaign() {
+        try {
+          const userId = document.getElementById("userId").value;
+          if (!userId) {
+            showResponse("Please enter a User ID", "error");
+            return;
+          }
+
+          if (selectedDevices.length < 3) {
+            showResponse("Please select at least 3 devices", "error");
+            return;
+          }
+
+          const campaignData = {
+            name: document.getElementById("campaignName").value,
+            description: document.getElementById("campaignDescription").value,
+            selectedDevices: selectedDevices,
+            dailyMessageSettings: {
+              day1_7: parseRange(document.getElementById("week1").value),
+              day8_14: parseRange(document.getElementById("week2").value),
+              day15_21: parseRange(document.getElementById("week3").value),
+              day22_plus: parseRange(document.getElementById("week4").value),
+            },
+            timingSettings: {
+              workingHours: {
+                start: document.getElementById("startTime").value,
+                end: document.getElementById("endTime").value,
+              },
+              timezone: "<%= process.env.TIMEZONE || 'Asia/Jakarta' %>",
+              intervalMinutes: { min: 30, max: 180 },
+              pauseDays: [0, 6], // Weekend pause
+            },
+          };
+
+          const response = await fetch(
+            `${API_BASE}/campaigns?userId=${userId}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(campaignData),
+            }
+          );
+
+          const data = await response.json();
+          showResponse(
+            JSON.stringify(data, null, 2),
+            data.success ? "success" : "error"
+          );
+
+          if (data.success) {
+            loadCampaigns();
+            // Clear form
+            document.getElementById("campaignName").value = "";
+            document.getElementById("campaignDescription").value = "";
+            selectedDevices = [];
+            loadDevices();
+          }
+        } catch (error) {
+          showResponse(`Error creating campaign: ${error.message}`, "error");
+        }
+      }
+
+      function parseRange(rangeStr) {
+        const [min, max] = rangeStr.split("-").map((n) => parseInt(n.trim()));
+        return { min, max };
+      }
+
+      async function loadCampaigns() {
+        try {
+          const userId = document.getElementById("userId").value;
+          if (!userId) return;
+
+          const response = await fetch(
+            `${API_BASE}/campaigns?userId=${userId}`
+          );
+          const data = await response.json();
+
+          if (data.success) {
+            displayCampaigns(data.data);
+          } else {
+            showResponse(`Error loading campaigns: ${data.error}`, "error");
+          }
+        } catch (error) {
+          showResponse(`Error loading campaigns: ${error.message}`, "error");
+        }
+      }
+
+      function displayCampaigns(campaigns) {
+        const campaignsList = document.getElementById("campaignsList");
+
+        if (campaigns.length === 0) {
+          campaignsList.innerHTML =
+            '<div class="loading">No campaigns found</div>';
+          return;
+        }
+
+        campaignsList.innerHTML = campaigns
+          .map(
+            (campaign) => `
+                <div class="card">
+                    <h4>${campaign.name}</h4>
+                    <p>${campaign.description || "No description"}</p>
+                    <p><strong>Status:</strong> <span class="status ${
+                      campaign.status
+                    }">${campaign.status}</span></p>
+                    <p><strong>Devices:</strong> ${
+                      campaign.selectedDevices.length
+                    }</p>
+                    <p><strong>Messages Sent:</strong> ${
+                      campaign.totalMessagesSent
+                    }</p>
+                    <p><strong>Conversations:</strong> ${
+                      campaign.totalConversations
+                    }</p>
+                    <div style="margin-top: 10px;">
+                        ${
+                          campaign.status === "active"
+                            ? `<button class="btn secondary" data-action="pause" data-campaign-id="${campaign.id}">Pause</button>`
+                            : campaign.status === "paused"
+                            ? `<button class="btn" data-action="resume" data-campaign-id="${campaign.id}">Resume</button>`
+                            : ""
+                        }
+                        <button class="btn danger" data-action="stop" data-campaign-id="${
+                          campaign.id
+                        }">Stop</button>
+                        <button class="btn secondary" data-action="stats" data-campaign-id="${
+                          campaign.id
+                        }">View Stats</button>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+
+        // Add event delegation for campaign buttons
+        campaignsList.addEventListener("click", function (e) {
+          if (e.target.dataset.action) {
+            const campaignId = e.target.dataset.campaignId;
+            const action = e.target.dataset.action;
+
+            if (action === "pause") {
+              pauseCampaign(campaignId);
+            } else if (action === "resume") {
+              resumeCampaign(campaignId);
+            } else if (action === "stop") {
+              stopCampaign(campaignId);
+            } else if (action === "stats") {
+              viewCampaignStats(campaignId);
+            }
+          }
+        });
+      }
+
+      async function pauseCampaign(campaignId) {
+        try {
+          const userId = document.getElementById("userId").value;
+          const response = await fetch(
+            `${API_BASE}/campaigns/${campaignId}/pause?userId=${userId}`,
+            {
+              method: "POST",
+            }
+          );
+          const data = await response.json();
+          showResponse(
+            JSON.stringify(data, null, 2),
+            data.success ? "success" : "error"
+          );
+          if (data.success) loadCampaigns();
+        } catch (error) {
+          showResponse(`Error pausing campaign: ${error.message}`, "error");
+        }
+      }
+
+      async function resumeCampaign(campaignId) {
+        try {
+          const userId = document.getElementById("userId").value;
+          const response = await fetch(
+            `${API_BASE}/campaigns/${campaignId}/resume?userId=${userId}`,
+            {
+              method: "POST",
+            }
+          );
+          const data = await response.json();
+          showResponse(
+            JSON.stringify(data, null, 2),
+            data.success ? "success" : "error"
+          );
+          if (data.success) loadCampaigns();
+        } catch (error) {
+          showResponse(`Error resuming campaign: ${error.message}`, "error");
+        }
+      }
+
+      async function stopCampaign(campaignId) {
+        if (!confirm("Are you sure you want to stop this campaign?")) return;
+
+        try {
+          const userId = document.getElementById("userId").value;
+          const response = await fetch(
+            `${API_BASE}/campaigns/${campaignId}/stop?userId=${userId}`,
+            {
+              method: "POST",
+            }
+          );
+          const data = await response.json();
+          showResponse(
+            JSON.stringify(data, null, 2),
+            data.success ? "success" : "error"
+          );
+          if (data.success) loadCampaigns();
+        } catch (error) {
+          showResponse(`Error stopping campaign: ${error.message}`, "error");
+        }
+      }
+
+      // Template Management
+      async function loadCampaignsForSelect() {
+        try {
+          const userId = document.getElementById("userId").value;
+          if (!userId) return;
+
+          const response = await fetch(
+            `${API_BASE}/campaigns?userId=${userId}`
+          );
+          const data = await response.json();
+
+          if (data.success) {
+            const campaignSelect = document.getElementById("campaignSelect");
+            campaignSelect.innerHTML =
+              '<option value="">Select a campaign...</option>' +
+              data.data
+                .map(
+                  (campaign) =>
+                    `<option value="${campaign.id}">${campaign.name}</option>`
+                )
+                .join("");
+          }
+        } catch (error) {
+          console.error("Error loading campaigns for select:", error);
+        }
+      }
+
+      function addConversationStep() {
+        conversationStepCount++;
+        const stepsContainer = document.getElementById("conversationSteps");
+        const newStep = document.createElement("div");
+        newStep.className = "conversation-step";
+        newStep.innerHTML = `
+                <h4>Step ${conversationStepCount}</h4>
+                <textarea placeholder="Enter message content..." rows="2"></textarea>
+                <button class="btn danger remove-step-btn" style="margin-top: 10px;">Remove</button>
+            `;
+        stepsContainer.appendChild(newStep);
+
+        // Add event listener to the new remove button
+        newStep
+          .querySelector(".remove-step-btn")
+          .addEventListener("click", function () {
+            newStep.remove();
+          });
+      }
+
+      function removeConversationStep(button) {
+        button.parentElement.remove();
+      }
+
+      async function createTemplate() {
+        try {
+          const userId = document.getElementById("userId").value;
+          const campaignId = document.getElementById("campaignSelect").value;
+
+          if (!userId || !campaignId) {
+            showResponse("Please select a campaign", "error");
+            return;
+          }
+
+          const steps = document.querySelectorAll(
+            "#conversationSteps .conversation-step textarea"
+          );
+          const conversationFlow = Array.from(steps).map((textarea, index) => ({
+            message: textarea.value,
+            senderType: "random",
+            receiverType: "random",
+          }));
+
+          const templateData = {
+            name: document.getElementById("templateName").value,
+            category: document.getElementById("templateCategory").value,
+            conversationFlow: conversationFlow,
+            variables: {
+              name: "User",
+              company: "Company",
+            },
+            settings: {
+              minDevicesRequired: 2,
+              maxDevicesInConversation: 4,
+              messageDelaySeconds: { min: 10, max: 60 },
+              canBeRepeated: true,
+              weight: 1,
+            },
+          };
+
+          const response = await fetch(
+            `${API_BASE}/campaigns/${campaignId}/templates?userId=${userId}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(templateData),
+            }
+          );
+
+          const data = await response.json();
+          showResponse(
+            JSON.stringify(data, null, 2),
+            data.success ? "success" : "error"
+          );
+
+          if (data.success) {
+            // Clear form
+            document.getElementById("templateName").value = "";
+            document.getElementById("conversationSteps").innerHTML = `
+                        <div class="conversation-step">
+                            <h4>Step 1</h4>
+                            <textarea placeholder="Enter message content..." rows="2"></textarea>
+                        </div>
+                    `;
+            conversationStepCount = 1;
+          }
+        } catch (error) {
+          showResponse(`Error creating template: ${error.message}`, "error");
+        }
+      }
+
+      // Analytics
+      async function loadCampaignsForAnalytics() {
+        try {
+          const userId = document.getElementById("userId").value;
+          if (!userId) return;
+
+          const response = await fetch(
+            `${API_BASE}/campaigns?userId=${userId}`
+          );
+          const data = await response.json();
+
+          if (data.success) {
+            const analyticsSelect = document.getElementById("analyticsSelect");
+            analyticsSelect.innerHTML =
+              '<option value="">Select a campaign...</option>' +
+              data.data
+                .map(
+                  (campaign) =>
+                    `<option value="${campaign.id}">${campaign.name}</option>`
+                )
+                .join("");
+
+            analyticsSelect.onchange = function () {
+              if (this.value) {
+                loadCampaignAnalytics(this.value);
+              }
+            };
+          }
+        } catch (error) {
+          console.error("Error loading campaigns for analytics:", error);
+        }
+      }
+
+      async function loadCampaignAnalytics(campaignId) {
+        try {
+          const userId = document.getElementById("userId").value;
+          const response = await fetch(
+            `${API_BASE}/campaigns/${campaignId}/stats?userId=${userId}`
+          );
+          const data = await response.json();
+
+          if (data.success) {
+            displayAnalytics(data.data);
+          } else {
+            showResponse(`Error loading analytics: ${data.error}`, "error");
+          }
+        } catch (error) {
+          showResponse(`Error loading analytics: ${error.message}`, "error");
+        }
+      }
+
+      function displayAnalytics(stats) {
+        const analyticsData = document.getElementById("analyticsData");
+
+        analyticsData.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.todayMessages}</div>
+                        <div class="stat-label">Today's Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.totalLogs}</div>
+                        <div class="stat-label">Total Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.connectedDevices}</div>
+                        <div class="stat-label">Connected Devices</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${
+                          stats.campaign.totalConversations
+                        }</div>
+                        <div class="stat-label">Total Conversations</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Campaign Details</h3>
+                    <p><strong>Name:</strong> ${stats.campaign.name}</p>
+                    <p><strong>Status:</strong> <span class="status ${
+                      stats.campaign.status
+                    }">${stats.campaign.status}</span></p>
+                    <p><strong>Started:</strong> ${new Date(
+                      stats.campaign.startedAt
+                    ).toLocaleString()}</p>
+                    <p><strong>Last Activity:</strong> ${
+                      stats.campaign.lastActivityAt
+                        ? new Date(
+                            stats.campaign.lastActivityAt
+                          ).toLocaleString()
+                        : "Never"
+                    }</p>
+                    <p><strong>Selected Devices:</strong> ${
+                      stats.campaign.selectedDevices.length
+                    }</p>
+                </div>
+            `;
+      }
+
+      async function viewCampaignStats(campaignId) {
+        const analyticsTab = document.querySelector('[data-tab="analytics"]');
+        showTab("analytics", analyticsTab);
+        document.getElementById("analyticsSelect").value = campaignId;
+        await loadCampaignAnalytics(campaignId);
+      }
+
+      // Utility Functions
+      function showResponse(message, type) {
+        const responseDiv = document.getElementById("response");
+        responseDiv.textContent = message;
+        responseDiv.className = `response ${type}`;
+        responseDiv.style.display = "block";
+
+        // Auto-hide after 10 seconds for success messages
+        if (type === "success") {
+          setTimeout(() => {
+            responseDiv.style.display = "none";
+          }, 10000);
+        }
+      }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        // Tab event listeners
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.addEventListener("click", function () {
+            showTab(this.dataset.tab, this);
+          });
+        });
+
+        // Button event listeners
+        document
+          .getElementById("createCampaignBtn")
+          .addEventListener("click", createCampaign);
+        document
+          .getElementById("refreshCampaignsBtn")
+          .addEventListener("click", loadCampaigns);
+        document
+          .getElementById("createTemplateBtn")
+          .addEventListener("click", createTemplate);
+        document
+          .getElementById("addStepBtn")
+          .addEventListener("click", addConversationStep);
+        document
+          .getElementById("refreshDevicesBtn")
+          .addEventListener("click", loadDevices);
+
+        // Initial load
+        loadDevices();
+        loadCampaigns();
+      });
+    </script>
+  </body>
+</html>

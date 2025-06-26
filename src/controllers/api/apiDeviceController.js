@@ -8,14 +8,14 @@ const WHATSAPP_API_TOKEN = process.env.WHATSAPP_API_TOKEN || 'test123';
 export const listSessions = async (req, res) => {
   try {
     // Make request to external WhatsApp API
-    const response = await axios.get('http://localhost:3000/api/whatsapp/sessions', {
+    const response = await axios.get(`${WHATSAPP_API_BASE_URL}/api/whatsapp/sessions`, {
         headers: {
           'Accept': 'application/json',
           'Accept-Language': 'en-GB,en;q=0.9,ar;q=0.8,id;q=0.7',
           'Connection': 'keep-alive',
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
-          'X-API-Token': 'test123',
-          'Authorization': 'Bearer test123',
+          'X-API-Token': WHATSAPP_API_TOKEN,
+          'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`,
           'DNT': '1'
         },
         withCredentials: true, // Jika butuh cookie
