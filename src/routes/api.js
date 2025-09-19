@@ -1,14 +1,30 @@
 import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import midtransClient from 'midtrans-client'
 import jwt from 'jsonwebtoken';
+import { initiatePayment } from '../controllers/orderController.js';
 import { listSessions, getUserDevices, deleteUserDevice, getAISettings, updateAISettings, createDevice, getBusinessTypes } from '../controllers/api/apiDeviceController.js';
 import { sendMessage, getMessages, sendImage, sendVideo, sendDocument, testConnection } from '../controllers/api/apiMessageController.js';
 import { uploadFile, deleteFile, getFileStats, getFiles, previewFile } from '../controllers/api/apiFileController.js';
 import { getWarmerDevices, getWarmerCampaigns, createWarmerCampaign, pauseWarmerCampaign, resumeWarmerCampaign, stopWarmerCampaign, getWarmerCampaignStats, createWarmerTemplate } from '../controllers/api/apiWarmerController.js';
 
+
+const prisma = new PrismaClient();
+const snap = new midtransClient.Snap({
+  isProduction: false,
+  serverKey: process.env.MIDTRANS_SERVER_KEY || 'SB-Mid-server-sKLnk6jQm-Wxyc7ztVGz7jge',
+  clientKey: process.env.MIDTRANS_CLIENT_KEY || 'SB-Mid-client-ykTL-QKGeMgdZSlr'
+});
 const router = express.Router();
 
 // API Authentication middleware
 const apiAuth = (req, res, next) => {
+
+  if (req.path === '/midtrans-webhook') {
+    return next();
+  }
+
+
   const apiToken = req.headers['x-api-token'];
   const jwtToken = req.cookies.token;
   
@@ -84,5 +100,93 @@ router.post('/warmer/campaigns/:id/resume', resumeWarmerCampaign);
 router.post('/warmer/campaigns/:id/stop', stopWarmerCampaign);
 router.get('/warmer/campaigns/:id/stats', getWarmerCampaignStats);
 router.post('/warmer/campaigns/:id/templates', createWarmerTemplate);
+
+
+
+// API untuk memulai pembayaran
+router.post('/order/:id/pay', initiatePayment);
+
+// Webhook Midtrans
+router.post('/midtrans-webhook', async (req, res) => {
+  try {
+    console.log('Webhook received:', JSON.stringify(req.body, null, 2));
+    
+    const notification = req.body;
+    const statusResponse = await snap.transaction.notification(notification);
+    
+    console.log('Status response:', statusResponse);
+
+    const orderId = statusResponse.order_id;
+    const transactionStatus = statusResponse.transaction_status;
+    const fraudStatus = statusResponse.fraud_status;
+
+    console.log(`Processing order ${orderId} with status ${transactionStatus}`);
+
+    // Logika status yang lebih robust
+    let paymentStatus;
+    switch (transactionStatus) {
+      case 'capture':
+        paymentStatus = fraudStatus === 'accept' ? 'PAID' : 'DENIED';
+        break;
+      case 'settlement':
+        paymentStatus = 'PAID';
+        break;
+      case 'pending':
+        paymentStatus = 'PENDING';
+        break;
+      case 'deny':
+      case 'cancel':
+      case 'expire':
+        paymentStatus = 'FAILED';
+        break;
+      default:
+        paymentStatus = 'PENDING';
+    }
+
+    console.log(`Updating order to status: ${paymentStatus}`);
+
+    // Update order
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        payment_status: paymentStatus,
+        payment_method: statusResponse.payment_type,
+        external_id: statusResponse.transaction_id,
+        paid_at: paymentStatus === 'PAID' ? new Date() : null,
+        metadata: statusResponse
+      }
+    });
+
+    console.log('Order updated:', updatedOrder);
+
+    // Jika pembayaran sukses, buat user subscription
+    if (paymentStatus === 'PAID') {
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: { subscription: true }
+      });
+
+      console.log('Creating subscription for order:', order);
+
+      await prisma.userSubscription.create({
+        data: {
+          user_id: order.user_id,
+          subscription_id: order.subscription_id,
+          start_date: new Date(),
+          end_date: new Date(Date.now() + order.subscription.duration_days * 24 * 60 * 60 * 1000),
+          updated_at: new Date() // Tambahkan ini
+        }
+      });
+
+      console.log('Subscription created successfully');
+    }
+
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error('Error handling webhook:', error);
+    res.status(500).send('Error processing webhook');
+  }
+});
+
 
 export default router; 

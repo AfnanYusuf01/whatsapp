@@ -23,6 +23,9 @@ export const index = async (req, res) => {
       select: { id: true, name: true }
     });
 
+    console.log('[index] req.user:', req.user);
+    console.log('[index] res.locals.user:', res.locals.user);
+
     res.render('crud/contact-management', { 
       contacts,
       tags,

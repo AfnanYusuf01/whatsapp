@@ -1,446 +1,268 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50 dark:bg-gray-900">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WhatsApp Warmer Service Testing</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Warmer Service - Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full">
+<div class="min-h-full bg-gray-50 dark:bg-gray-900">
 
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 20px;
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
-
-      .header {
-        background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-        color: white;
-        padding: 30px;
-        text-align: center;
-      }
-
-      .header h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-      }
-
-      .header p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-      }
-
-      .tabs {
-        display: flex;
-        background: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-      }
-
-      .tab {
-        flex: 1;
-        padding: 15px 20px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 500;
-        color: #6c757d;
-        transition: all 0.3s ease;
-      }
-
-      .tab.active {
-        background: white;
-        color: #25d366;
-        border-bottom: 3px solid #25d366;
-      }
-
-      .tab:hover {
-        background: #e9ecef;
-      }
-
-      .content {
-        padding: 30px;
-      }
-
-      .tab-content {
-        display: none;
-      }
-
-      .tab-content.active {
-        display: block;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 600;
-        color: #333;
-      }
-
-      input,
-      select,
-      textarea {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.3s ease;
-      }
-
-      input:focus,
-      select:focus,
-      textarea:focus {
-        outline: none;
-        border-color: #25d366;
-      }
-
-      .btn {
-        background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 600;
-        transition: transform 0.2s ease;
-        margin-right: 10px;
-        margin-bottom: 10px;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-      }
-
-      .btn.secondary {
-        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-      }
-
-      .btn.danger {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-      }
-
-      .card {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-left: 4px solid #25d366;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-      }
-
-      .status {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .status.active {
-        background: #d4edda;
-        color: #155724;
-      }
-      .status.paused {
-        background: #fff3cd;
-        color: #856404;
-      }
-      .status.stopped {
-        background: #f8d7da;
-        color: #721c24;
-      }
-
-      .response {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 8px;
-        font-family: "Courier New", monospace;
-        font-size: 0.9rem;
-        white-space: pre-wrap;
-        max-height: 300px;
-        overflow-y: auto;
-      }
-
-      .response.success {
-        background: #d4edda;
-        border: 1px solid #c3e6cb;
-        color: #155724;
-      }
-
-      .response.error {
-        background: #f8d7da;
-        border: 1px solid #f5c6cb;
-        color: #721c24;
-      }
-
-      .conversation-step {
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 10px;
-      }
-
-      .conversation-step h4 {
-        color: #25d366;
-        margin-bottom: 10px;
-      }
-
-      .device-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 10px;
-      }
-
-      .device-item {
-        background: #e9ecef;
-        padding: 8px 12px;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .device-item:hover {
-        background: #25d366;
-        color: white;
-      }
-
-      .device-item.selected {
-        background: #25d366;
-        color: white;
-      }
-
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-bottom: 20px;
-      }
-
-      .stat-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .stat-number {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #25d366;
-      }
-
-      .stat-label {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-top: 5px;
-      }
-
-      .loading {
-        text-align: center;
-        padding: 20px;
-        color: #6c757d;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>🔥 WhatsApp Warmer Service</h1>
-        <p>Cross-Device Conversation Automation & Testing Interface</p>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active" data-tab="campaigns">📊 Campaigns</button>
-        <button class="tab" data-tab="templates">💬 Templates</button>
-        <button class="tab" data-tab="analytics">📈 Analytics</button>
-        <button class="tab" data-tab="devices">📱 Devices</button>
-      </div>
-
-      <div class="content">
-        <!-- User ID Input -->
-        <div class="form-group">
-          <label for="userId">User ID:</label>
-          <input
-            type="text"
-            id="userId"
-            value="01234567-89ab-cdef-0123-456789abcdef"
-            placeholder="Enter your user ID"
-          />
+<!-- Header with Breadcrumb Navigation -->
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                  <li class="inline-flex items-center">
+                    <a href="/dashboard" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                      <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <div class="flex items-center">
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <a href="#" class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">WhatsApp</a>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex items-center">
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Warmer Service</span>
+                    </div>
+                  </li>
+                </ol>
+            </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+                <svg class="w-6 h-6 mr-2 inline text-orange-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                WhatsApp Warmer Service
+            </h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Cross-Device Conversation Automation & Testing Interface</p>
         </div>
+        <div class="sm:flex">
+            <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0 dark:divide-gray-700">
+                <div class="flex pl-0 mt-3 space-x-1 sm:pl-2 sm:mt-0">
+                    <button id="refreshDataBtn" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" title="Refresh All Data">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <a href="/dashboard" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" title="Back to Dashboard">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Messages -->
+<div id="alert-container" class="mb-4"></div>
+
+<!-- User ID Configuration -->
+<div class="p-4 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center space-x-4">
+            <div class="flex-1">
+                <label for="userId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                    User ID
+                </label>
+                <input type="text" id="userId" value="01234567-89ab-cdef-0123-456789abcdef" 
+                       placeholder="Enter your user ID"
+                       class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
+      </div>
+        </div>
+    </div>
+      </div>
+
+<!-- Tab Navigation -->
+<div class="border-b border-gray-200 dark:border-gray-700">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mb-px flex space-x-8" aria-label="Tabs">
+        <button class="tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm active" data-tab="campaigns">
+            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Campaigns
+        </button>
+        <button class="tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="templates">
+            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path></svg>
+            Templates
+        </button>
+        <button class="tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="analytics">
+            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+            Analytics
+        </button>
+        <button class="tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="devices">
+            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"></path></svg>
+            Devices
+        </button>
+    </nav>
+        </div>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <!-- Campaigns Tab -->
         <div id="campaigns" class="tab-content active">
-          <h2>Campaign Management</h2>
-
-          <div class="grid">
-            <div class="card">
-              <h3>Create New Campaign</h3>
-              <div class="form-group">
-                <label for="campaignName">Campaign Name:</label>
-                <input
-                  type="text"
-                  id="campaignName"
-                  placeholder="My Warmer Campaign"
-                />
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Create New Campaign -->
+        <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2L3 7v11a1 1 0 001 1h3v-8h6v8h3a1 1 0 001-1V7l-7-5z"></path></svg>
+                    Create New Campaign
+                </h3>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <label for="campaignName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Campaign Name</label>
+                    <input type="text" id="campaignName" placeholder="My Warmer Campaign" 
+                           class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
               </div>
 
-              <div class="form-group">
-                <label for="campaignDescription">Description:</label>
-                <textarea
-                  id="campaignDescription"
-                  rows="3"
-                  placeholder="Campaign description..."
-                ></textarea>
+                <div>
+                    <label for="campaignDescription" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                    <textarea id="campaignDescription" rows="3" placeholder="Campaign description..." 
+                              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
               </div>
 
-              <div class="form-group">
-                <label>Selected Devices (click to select):</label>
-                <div id="deviceSelection" class="device-list">
-                  <div class="loading">Loading devices...</div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selected Devices (click to select)</label>
+                    <div id="deviceSelection" class="min-h-[100px] p-4 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                        <div class="flex items-center justify-center text-gray-500 dark:text-gray-400">
+                            <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
+                            Loading devices...
+                        </div>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label>Daily Message Settings:</label>
-                <div
-                  style="
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 10px;
-                  "
-                >
                   <div>
-                    <label>Week 1 (Min-Max):</label>
-                    <input
-                      type="text"
-                      id="week1"
-                      value="3-5"
-                      placeholder="3-5"
-                    />
+                    <label class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">Daily Message Settings</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="week1" class="block mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">Week 1 (Min-Max)</label>
+                            <input type="text" id="week1" value="3-5" placeholder="3-5" 
+                                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                   </div>
                   <div>
-                    <label>Week 2 (Min-Max):</label>
-                    <input
-                      type="text"
-                      id="week2"
-                      value="5-8"
-                      placeholder="5-8"
-                    />
+                            <label for="week2" class="block mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">Week 2 (Min-Max)</label>
+                            <input type="text" id="week2" value="5-8" placeholder="5-8" 
+                                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                   </div>
                   <div>
-                    <label>Week 3 (Min-Max):</label>
-                    <input
-                      type="text"
-                      id="week3"
-                      value="8-12"
-                      placeholder="8-12"
-                    />
+                            <label for="week3" class="block mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">Week 3 (Min-Max)</label>
+                            <input type="text" id="week3" value="8-12" placeholder="8-12" 
+                                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                   </div>
                   <div>
-                    <label>Week 4+ (Min-Max):</label>
-                    <input
-                      type="text"
-                      id="week4"
-                      value="10-15"
-                      placeholder="10-15"
-                    />
+                            <label for="week4" class="block mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">Week 4+ (Min-Max)</label>
+                            <input type="text" id="week4" value="10-15" placeholder="10-15" 
+                                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                   </div>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label>Working Hours:</label>
-                <div
-                  style="
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 10px;
-                  "
-                >
                   <div>
-                    <label>Start Time:</label>
-                    <input type="time" id="startTime" value="09:00" />
+                    <label class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">Working Hours</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="startTime" class="block mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">Start Time</label>
+                            <input type="time" id="startTime" value="09:00" 
+                                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                   </div>
                   <div>
-                    <label>End Time:</label>
-                    <input type="time" id="endTime" value="17:00" />
+                            <label for="endTime" class="block mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">End Time</label>
+                            <input type="time" id="endTime" value="17:00" 
+                                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                   </div>
                 </div>
               </div>
 
-              <button class="btn" id="createCampaignBtn">
+                <button id="createCampaignBtn" class="w-full text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
                 Create Campaign
               </button>
             </div>
-
-            <div class="card">
-              <h3>Existing Campaigns</h3>
-              <div id="campaignsList">
-                <div class="loading">Loading campaigns...</div>
               </div>
-              <button class="btn secondary" id="refreshCampaignsBtn">
-                Refresh Campaigns
+
+        <!-- Existing Campaigns -->
+        <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Existing Campaigns
+                    </h3>
+                    <button id="refreshCampaignsBtn" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                        Refresh
               </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="campaignsList" class="space-y-4">
+                    <div class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
+                        <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                        Loading campaigns...
+                    </div>
+                </div>
+            </div>
             </div>
           </div>
         </div>
 
         <!-- Templates Tab -->
         <div id="templates" class="tab-content">
-          <h2>Conversation Templates</h2>
-
-          <div class="grid">
-            <div class="card">
-              <h3>Create Template</h3>
-              <div class="form-group">
-                <label for="campaignSelect">Select Campaign:</label>
-                <select id="campaignSelect">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Create Template -->
+        <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path></svg>
+                    Create Template
+                </h3>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <label for="campaignSelect" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Campaign</label>
+                    <select id="campaignSelect" 
+                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                   <option value="">Select a campaign...</option>
                 </select>
               </div>
 
-              <div class="form-group">
-                <label for="templateName">Template Name:</label>
-                <input
-                  type="text"
-                  id="templateName"
-                  placeholder="Morning Greeting"
-                />
+                <div>
+                    <label for="templateName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Template Name</label>
+                    <input type="text" id="templateName" placeholder="Morning Greeting" 
+                           class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
               </div>
 
-              <div class="form-group">
-                <label for="templateCategory">Category:</label>
-                <select id="templateCategory">
+                <div>
+                    <label for="templateCategory" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                    <select id="templateCategory" 
+                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                   <option value="greeting">Greeting</option>
                   <option value="casual_chat">Casual Chat</option>
                   <option value="business_talk">Business Talk</option>
@@ -452,29 +274,45 @@
                 </select>
               </div>
 
-              <div class="form-group">
-                <label>Conversation Flow:</label>
-                <div id="conversationSteps">
-                  <div class="conversation-step">
-                    <h4>Step 1</h4>
-                    <textarea
-                      placeholder="Enter message content..."
-                      rows="2"
-                    ></textarea>
+                <div>
+                    <label class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">Conversation Flow</label>
+                    <div id="conversationSteps" class="space-y-3">
+                        <div class="conversation-step bg-gray-50 border border-gray-300 rounded-lg p-4 dark:bg-gray-700 dark:border-gray-600">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-medium text-primary-600 dark:text-primary-400">Step 1</h4>
                   </div>
+                            <textarea placeholder="Enter message content..." rows="2" 
+                                      class="shadow-sm bg-white border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
                 </div>
-                <button class="btn secondary" id="addStepBtn">Add Step</button>
+                    </div>
+                    <button id="addStepBtn" class="mt-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                        Add Step
+                    </button>
               </div>
 
-              <button class="btn" id="createTemplateBtn">
+                <button id="createTemplateBtn" class="w-full text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
                 Create Template
               </button>
             </div>
+            </div>
 
-            <div class="card">
-              <h3>Template Library</h3>
-              <div id="templatesList">
-                <div class="loading">Select a campaign to view templates</div>
+        <!-- Template Library -->
+        <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"></path></svg>
+                    Template Library
+                </h3>
+            </div>
+            <div class="p-6">
+                <div id="templatesList" class="space-y-4">
+                    <div class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
+                        <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"></path></svg>
+                        Select a campaign to view templates
+                    </div>
+                </div>
               </div>
             </div>
           </div>
@@ -482,35 +320,293 @@
 
         <!-- Analytics Tab -->
         <div id="analytics" class="tab-content">
-          <h2>Campaign Analytics</h2>
-
-          <div class="form-group">
-            <label for="analyticsSelect">Select Campaign:</label>
-            <select id="analyticsSelect">
+    <div class="space-y-6">
+        <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                    Campaign Analytics
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="mb-6">
+                    <label for="analyticsSelect" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Campaign</label>
+                    <select id="analyticsSelect" 
+                            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
               <option value="">Select a campaign...</option>
             </select>
           </div>
 
           <div id="analyticsData">
-            <div class="loading">Select a campaign to view analytics</div>
+                    <div class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
+                        <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                        Select a campaign to view analytics
+                    </div>
+                </div>
+            </div>
+        </div>
           </div>
         </div>
 
         <!-- Devices Tab -->
         <div id="devices" class="tab-content">
-          <h2>Available Devices</h2>
-          <div id="devicesList">
-            <div class="loading">Loading devices...</div>
-          </div>
-          <button class="btn secondary" id="refreshDevicesBtn">
+    <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"></path></svg>
+                    Available Devices
+                </h3>
+                <button id="refreshDevicesBtn" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
             Refresh Devices
           </button>
+            </div>
+        </div>
+        <div class="p-6">
+            <div id="devicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400 col-span-full">
+                    <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                    Loading devices...
+                </div>
+            </div>
+        </div>
+    </div>
         </div>
 
         <!-- Response Display -->
-        <div id="response" class="response" style="display: none"></div>
+<div id="response" class="response hidden mt-6 p-4 rounded-lg border dark:border-gray-600"></div>
+
       </div>
     </div>
+
+<!-- Custom Styles -->
+<style>
+    .bg-primary-50 { background-color: #eff6ff; }
+    .bg-primary-100 { background-color: #dbeafe; }
+    .bg-primary-500 { background-color: #3b82f6; }
+    .bg-primary-600 { background-color: #2563eb; }
+    .bg-primary-700 { background-color: #1d4ed8; }
+    .bg-primary-800 { background-color: #1e40af; }
+    .text-primary-600 { color: #2563eb; }
+    .text-primary-700 { color: #1d4ed8; }
+    .text-primary-400 { color: #60a5fa; }
+    .border-primary-300 { border-color: #93c5fd; }
+    .border-primary-500 { border-color: #3b82f6; }
+    .focus\:ring-primary-300:focus { box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5); }
+    .focus\:ring-primary-500:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); }
+    .focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+    .focus\:border-primary-500:focus { border-color: #3b82f6; }
+    .hover\:bg-primary-800:hover { background-color: #1e40af; }
+    .hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+    .dark .dark\:bg-primary-600 { background-color: #2563eb; }
+    .dark .dark\:hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+    .dark .dark\:focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+    .dark .dark\:focus\:ring-primary-600:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5); }
+    .dark .dark\:text-primary-400 { color: #60a5fa; }
+
+    /* Tab styles */
+    .tab.active {
+        color: #2563eb !important;
+        border-bottom-color: #2563eb !important;
+    }
+
+    /* Tab content */
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Device selection styles */
+    .device-item {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+        background-color: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .device-item:hover {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+
+    .device-item.selected {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+
+    .dark .device-item {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #d1d5db;
+    }
+
+    .dark .device-item:hover,
+    .dark .device-item.selected {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+
+    /* Status badges */
+    .status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-left: 0.5rem;
+    }
+
+    .status.active {
+        background-color: #dcfce7;
+        color: #16a34a;
+        border: 1px solid #16a34a;
+    }
+    .status.paused {
+        background-color: #fef3c7;
+        color: #d97706;
+        border: 1px solid #d97706;
+    }
+    .status.stopped {
+        background-color: #fecaca;
+        color: #dc2626;
+        border: 1px solid #dc2626;
+    }
+    .status.connected {
+        background-color: #dcfce7;
+        color: #16a34a;
+        border: 1px solid #16a34a;
+    }
+    .status.pending {
+        background-color: #fef3c7;
+        color: #d97706;
+        border: 1px solid #d97706;
+    }
+    .status.disconnected {
+        background-color: #fecaca;
+        color: #dc2626;
+        border: 1px solid #dc2626;
+    }
+
+    .dark .status.active,
+    .dark .status.connected {
+        background-color: #14532d;
+        color: #22c55e;
+        border-color: #22c55e;
+    }
+    .dark .status.paused,
+    .dark .status.pending {
+        background-color: #451a03;
+        color: #f59e0b;
+        border-color: #f59e0b;
+    }
+    .dark .status.stopped,
+    .dark .status.disconnected {
+        background-color: #450a0a;
+        color: #ef4444;
+        border-color: #ef4444;
+    }
+
+    /* Response styles */
+    .response.success {
+        background-color: #dcfce7;
+        border-color: #16a34a;
+        color: #14532d;
+    }
+    .response.error {
+        background-color: #fecaca;
+        border-color: #dc2626;
+        color: #450a0a;
+    }
+
+    .dark .response.success {
+        background-color: #14532d;
+        border-color: #22c55e;
+        color: #dcfce7;
+    }
+    .dark .response.error {
+        background-color: #450a0a;
+        border-color: #ef4444;
+        color: #fecaca;
+    }
+
+    /* Loading animation */
+    .loading-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Conversation step */
+    .conversation-step .remove-step-btn {
+        margin-top: 0.75rem;
+    }
+</style>
+
+<!-- Add alert function and update functions for modern styling -->
+<script>
+    // Alert function to match messages.ejs style
+    function showAlert(message, type = 'info') {
+        const alertContainer = document.getElementById('alert-container');
+        if (!alertContainer) return;
+
+        const alertTypes = {
+            success: 'bg-green-100 border-green-500 text-green-700 dark:bg-green-900 dark:border-green-600 dark:text-green-300',
+            error: 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900 dark:border-red-600 dark:text-red-300',
+            warning: 'bg-yellow-100 border-yellow-500 text-yellow-700 dark:bg-yellow-900 dark:border-yellow-600 dark:text-yellow-300',
+            info: 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900 dark:border-blue-600 dark:text-blue-300'
+        };
+
+        const iconTypes = {
+            success: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+            error: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+            warning: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+            info: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>'
+        };
+
+        const alertId = 'alert-' + Date.now();
+        const alertElement = document.createElement('div');
+        alertElement.id = alertId;
+        alertElement.className = `flex items-center p-4 mb-4 border rounded-lg ${alertTypes[type] || alertTypes.info}`;
+        alertElement.innerHTML = `
+            <div class="flex-shrink-0">
+                ${iconTypes[type] || iconTypes.info}
+            </div>
+            <div class="ml-3 text-sm font-medium">
+                ${message}
+            </div>
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:hover:bg-gray-700" onclick="document.getElementById('${alertId}').remove()">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
+
+        alertContainer.appendChild(alertElement);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (document.getElementById(alertId)) {
+                document.getElementById(alertId).remove();
+            }
+        }, 5000);
+    }
+</script>
 
     <script>
       const API_BASE = "/api/warmer";
@@ -553,7 +649,7 @@
         try {
           const userId = document.getElementById("userId").value;
           if (!userId) {
-            showResponse("Please enter a User ID", "error");
+            showAlert("Please enter a User ID", "error");
             return;
           }
 
@@ -563,10 +659,10 @@
           if (data.success) {
             displayDevices(data.data);
           } else {
-            showResponse(`Error loading devices: ${data.error}`, "error");
+            showAlert(`Error loading devices: ${data.error}`, "error");
           }
         } catch (error) {
-          showResponse(`Error loading devices: ${error.message}`, "error");
+          showAlert(`Error loading devices: ${error.message}`, "error");
         }
       }
 
@@ -575,9 +671,18 @@
         const devicesList = document.getElementById("devicesList");
 
         if (devices.length === 0) {
-          deviceSelection.innerHTML =
-            '<div class="loading">No devices found</div>';
-          devicesList.innerHTML = '<div class="loading">No devices found</div>';
+          deviceSelection.innerHTML = `
+            <div class="flex items-center justify-center text-gray-500 dark:text-gray-400">
+              <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"></path></svg>
+              No devices found
+            </div>
+          `;
+          devicesList.innerHTML = `
+            <div class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400 col-span-full">
+              <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"></path></svg>
+              No devices found
+            </div>
+          `;
           return;
         }
 
@@ -605,23 +710,29 @@
           });
         });
 
-        // For devices list
+        // For devices list - using modern cards
         devicesList.innerHTML = devices
           .map(
             (device) => `
-                <div class="card">
-                    <h4>${device.alias || device.sessionId}</h4>
-                    <p><strong>Status:</strong> <span class="status ${
-                      device.status
-                    }">${device.status}</span></p>
-                    <p><strong>Phone:</strong> ${
-                      device.phoneNumber || "Not set"
-                    }</p>
-                    <p><strong>Last Connection:</strong> ${
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 dark:bg-gray-700 dark:border-gray-600">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white">${device.alias || device.sessionId}</h4>
+                        <span class="status ${device.status}">${device.status}</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">Phone:</span>
+                            <span class="text-gray-900 dark:text-white">${device.phoneNumber || "Not set"}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">Last Connection:</span>
+                            <span class="text-gray-900 dark:text-white">${
                       device.lastConnection
                         ? new Date(device.lastConnection).toLocaleString()
                         : "Never"
-                    }</p>
+                            }</span>
+                        </div>
+                    </div>
                 </div>
             `
           )
@@ -703,7 +814,7 @@
             loadDevices();
           }
         } catch (error) {
-          showResponse(`Error creating campaign: ${error.message}`, "error");
+          showAlert(`Error creating campaign: ${error.message}`, "error");
         }
       }
 
@@ -725,10 +836,10 @@
           if (data.success) {
             displayCampaigns(data.data);
           } else {
-            showResponse(`Error loading campaigns: ${data.error}`, "error");
+            showAlert(`Error loading campaigns: ${data.error}`, "error");
           }
         } catch (error) {
-          showResponse(`Error loading campaigns: ${error.message}`, "error");
+          showAlert(`Error loading campaigns: ${error.message}`, "error");
         }
       }
 
@@ -736,43 +847,50 @@
         const campaignsList = document.getElementById("campaignsList");
 
         if (campaigns.length === 0) {
-          campaignsList.innerHTML =
-            '<div class="loading">No campaigns found</div>';
+          campaignsList.innerHTML = `
+            <div class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
+              <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              No campaigns found
+            </div>
+          `;
           return;
         }
 
         campaignsList.innerHTML = campaigns
           .map(
             (campaign) => `
-                <div class="card">
-                    <h4>${campaign.name}</h4>
-                    <p>${campaign.description || "No description"}</p>
-                    <p><strong>Status:</strong> <span class="status ${
-                      campaign.status
-                    }">${campaign.status}</span></p>
-                    <p><strong>Devices:</strong> ${
-                      campaign.selectedDevices.length
-                    }</p>
-                    <p><strong>Messages Sent:</strong> ${
-                      campaign.totalMessagesSent
-                    }</p>
-                    <p><strong>Conversations:</strong> ${
-                      campaign.totalConversations
-                    }</p>
-                    <div style="margin-top: 10px;">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 dark:bg-gray-700 dark:border-gray-600">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-white">${campaign.name}</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${campaign.description || "No description"}</p>
+                        </div>
+                        <span class="status ${campaign.status}">${campaign.status}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mb-4 text-sm">
+                        <div class="text-center">
+                            <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">${campaign.selectedDevices.length}</div>
+                            <div class="text-gray-600 dark:text-gray-400">Devices</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">${campaign.totalMessagesSent}</div>
+                            <div class="text-gray-600 dark:text-gray-400">Messages</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">${campaign.totalConversations}</div>
+                            <div class="text-gray-600 dark:text-gray-400">Conversations</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
                         ${
                           campaign.status === "active"
-                            ? `<button class="btn secondary" data-action="pause" data-campaign-id="${campaign.id}">Pause</button>`
+                            ? `<button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700" data-action="pause" data-campaign-id="${campaign.id}">Pause</button>`
                             : campaign.status === "paused"
-                            ? `<button class="btn" data-action="resume" data-campaign-id="${campaign.id}">Resume</button>`
+                            ? `<button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 rounded-lg dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" data-action="resume" data-campaign-id="${campaign.id}">Resume</button>`
                             : ""
                         }
-                        <button class="btn danger" data-action="stop" data-campaign-id="${
-                          campaign.id
-                        }">Stop</button>
-                        <button class="btn secondary" data-action="stats" data-campaign-id="${
-                          campaign.id
-                        }">View Stats</button>
+                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 rounded-lg dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800" data-action="stop" data-campaign-id="${campaign.id}">Stop</button>
+                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700" data-action="stats" data-campaign-id="${campaign.id}">View Stats</button>
                     </div>
                 </div>
             `
@@ -808,13 +926,13 @@
             }
           );
           const data = await response.json();
-          showResponse(
-            JSON.stringify(data, null, 2),
+          showAlert(
+            data.success ? "Campaign paused successfully" : data.message || "Failed to pause campaign",
             data.success ? "success" : "error"
           );
           if (data.success) loadCampaigns();
         } catch (error) {
-          showResponse(`Error pausing campaign: ${error.message}`, "error");
+          showAlert(`Error pausing campaign: ${error.message}`, "error");
         }
       }
 
@@ -828,13 +946,13 @@
             }
           );
           const data = await response.json();
-          showResponse(
-            JSON.stringify(data, null, 2),
+          showAlert(
+            data.success ? "Campaign resumed successfully" : data.message || "Failed to resume campaign",
             data.success ? "success" : "error"
           );
           if (data.success) loadCampaigns();
         } catch (error) {
-          showResponse(`Error resuming campaign: ${error.message}`, "error");
+          showAlert(`Error resuming campaign: ${error.message}`, "error");
         }
       }
 
@@ -850,13 +968,13 @@
             }
           );
           const data = await response.json();
-          showResponse(
-            JSON.stringify(data, null, 2),
+          showAlert(
+            data.success ? "Campaign stopped successfully" : data.message || "Failed to stop campaign",
             data.success ? "success" : "error"
           );
           if (data.success) loadCampaigns();
         } catch (error) {
-          showResponse(`Error stopping campaign: ${error.message}`, "error");
+          showAlert(`Error stopping campaign: ${error.message}`, "error");
         }
       }
 
@@ -891,11 +1009,17 @@
         conversationStepCount++;
         const stepsContainer = document.getElementById("conversationSteps");
         const newStep = document.createElement("div");
-        newStep.className = "conversation-step";
+        newStep.className = "conversation-step bg-gray-50 border border-gray-300 rounded-lg p-4 dark:bg-gray-700 dark:border-gray-600";
         newStep.innerHTML = `
-                <h4>Step ${conversationStepCount}</h4>
-                <textarea placeholder="Enter message content..." rows="2"></textarea>
-                <button class="btn danger remove-step-btn" style="margin-top: 10px;">Remove</button>
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="text-sm font-medium text-primary-600 dark:text-primary-400">Step ${conversationStepCount}</h4>
+                    <button class="remove-step-btn inline-flex items-center px-2 py-1 text-xs font-medium text-center text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 rounded dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        Remove
+                    </button>
+                </div>
+                <textarea placeholder="Enter message content..." rows="2" 
+                          class="shadow-sm bg-white border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
             `;
         stepsContainer.appendChild(newStep);
 
@@ -917,7 +1041,7 @@
           const campaignId = document.getElementById("campaignSelect").value;
 
           if (!userId || !campaignId) {
-            showResponse("Please select a campaign", "error");
+            showAlert("Please select a campaign", "error");
             return;
           }
 
@@ -957,8 +1081,8 @@
           );
 
           const data = await response.json();
-          showResponse(
-            JSON.stringify(data, null, 2),
+          showAlert(
+            data.success ? "Template created successfully" : data.message || "Failed to create template",
             data.success ? "success" : "error"
           );
 
@@ -966,15 +1090,18 @@
             // Clear form
             document.getElementById("templateName").value = "";
             document.getElementById("conversationSteps").innerHTML = `
-                        <div class="conversation-step">
-                            <h4>Step 1</h4>
-                            <textarea placeholder="Enter message content..." rows="2"></textarea>
+                        <div class="conversation-step bg-gray-50 border border-gray-300 rounded-lg p-4 dark:bg-gray-700 dark:border-gray-600">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-medium text-primary-600 dark:text-primary-400">Step 1</h4>
+                            </div>
+                            <textarea placeholder="Enter message content..." rows="2" 
+                                      class="shadow-sm bg-white border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
                         </div>
                     `;
             conversationStepCount = 1;
           }
         } catch (error) {
-          showResponse(`Error creating template: ${error.message}`, "error");
+          showAlert(`Error creating template: ${error.message}`, "error");
         }
       }
 
@@ -1022,10 +1149,10 @@
           if (data.success) {
             displayAnalytics(data.data);
           } else {
-            showResponse(`Error loading analytics: ${data.error}`, "error");
+            showAlert(`Error loading analytics: ${data.error}`, "error");
           }
         } catch (error) {
-          showResponse(`Error loading analytics: ${error.message}`, "error");
+          showAlert(`Error loading analytics: ${error.message}`, "error");
         }
       }
 
@@ -1033,46 +1160,65 @@
         const analyticsData = document.getElementById("analyticsData");
 
         analyticsData.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">${stats.todayMessages}</div>
-                        <div class="stat-label">Today's Messages</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow text-center dark:bg-gray-800">
+                        <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">${stats.todayMessages}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Today's Messages</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${stats.totalLogs}</div>
-                        <div class="stat-label">Total Messages</div>
+                    <div class="bg-white p-6 rounded-lg shadow text-center dark:bg-gray-800">
+                        <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">${stats.totalLogs}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Messages</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${stats.connectedDevices}</div>
-                        <div class="stat-label">Connected Devices</div>
+                    <div class="bg-white p-6 rounded-lg shadow text-center dark:bg-gray-800">
+                        <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">${stats.connectedDevices}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Connected Devices</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${
+                    <div class="bg-white p-6 rounded-lg shadow text-center dark:bg-gray-800">
+                        <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">${
                           stats.campaign.totalConversations
                         }</div>
-                        <div class="stat-label">Total Conversations</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Conversations</div>
                     </div>
                 </div>
                 
-                <div class="card">
-                    <h3>Campaign Details</h3>
-                    <p><strong>Name:</strong> ${stats.campaign.name}</p>
-                    <p><strong>Status:</strong> <span class="status ${
-                      stats.campaign.status
-                    }">${stats.campaign.status}</span></p>
-                    <p><strong>Started:</strong> ${new Date(
+                <div class="bg-white shadow rounded-lg p-6 dark:bg-gray-800">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Campaign Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Name:</span>
+                                <span class="text-gray-900 dark:text-white font-medium">${stats.campaign.name}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-400">Status:</span>
+                                <span class="status ${stats.campaign.status}">${stats.campaign.status}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Started:</span>
+                                <span class="text-gray-900 dark:text-white">${new Date(
                       stats.campaign.startedAt
-                    ).toLocaleString()}</p>
-                    <p><strong>Last Activity:</strong> ${
+                                ).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Last Activity:</span>
+                                <span class="text-gray-900 dark:text-white">${
                       stats.campaign.lastActivityAt
                         ? new Date(
                             stats.campaign.lastActivityAt
                           ).toLocaleString()
                         : "Never"
-                    }</p>
-                    <p><strong>Selected Devices:</strong> ${
+                                }</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Selected Devices:</span>
+                                <span class="text-gray-900 dark:text-white">${
                       stats.campaign.selectedDevices.length
-                    }</p>
+                                }</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
       }
@@ -1084,17 +1230,17 @@
         await loadCampaignAnalytics(campaignId);
       }
 
-      // Utility Functions
+      // Utility Functions - Updated showResponse to use modern styling
       function showResponse(message, type) {
         const responseDiv = document.getElementById("response");
         responseDiv.textContent = message;
-        responseDiv.className = `response ${type}`;
-        responseDiv.style.display = "block";
+        responseDiv.className = `response ${type} mt-6 p-4 rounded-lg border font-mono text-sm whitespace-pre-wrap max-h-80 overflow-y-auto`;
+        responseDiv.classList.remove("hidden");
 
         // Auto-hide after 10 seconds for success messages
         if (type === "success") {
           setTimeout(() => {
-            responseDiv.style.display = "none";
+            responseDiv.classList.add("hidden");
           }, 10000);
         }
       }
@@ -1124,6 +1270,22 @@
         document
           .getElementById("refreshDevicesBtn")
           .addEventListener("click", loadDevices);
+
+        // Add refresh data button handler
+        document.getElementById("refreshDataBtn")?.addEventListener("click", function() {
+          const currentTab = document.querySelector(".tab.active")?.dataset.tab;
+          if (currentTab === "campaigns") {
+            loadCampaigns();
+            loadDevices();
+          } else if (currentTab === "devices") {
+            loadDevices();
+          } else if (currentTab === "analytics") {
+            loadCampaignsForAnalytics();
+          } else if (currentTab === "templates") {
+            loadCampaignsForSelect();
+          }
+          showAlert("Data refreshed", "success");
+        });
 
         // Initial load
         loadDevices();

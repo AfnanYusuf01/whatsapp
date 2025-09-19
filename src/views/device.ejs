@@ -1,147 +1,730 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title><%= title %></title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Add Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <!-- Add QR Code library -->
-  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
-  <style>
-    .device-card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    .device-header {
-      font-weight: bold;
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-    }
-    .form-control-sm {
-      font-size: 0.9rem;
-    }
-    .navbar {
-      margin-bottom: 2rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
-<body>
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <span class="navbar-brand"><%= title %></span>
-      <div class="d-flex align-items-center">
-        <span class="me-3">Welcome, <%= user.full_name %></span>
-        <a href="/dashboard" class="btn btn-secondary me-2">Dashboard</a>
-        <a href="/logout" class="btn btn-danger">Logout</a>
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                  <li class="inline-flex items-center">
+                    <a href="/dashboard" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                      <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <div class="flex items-center">
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <a href="#" class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">WhatsApp</a>
+      </div>
+                  </li>
+                  <li>
+                    <div class="flex items-center">
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Devices</span>
+    </div>
+                  </li>
+                </ol>
+  </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Device Management</h1>
+        </div>
+        <div class="sm:flex">
+            <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0 dark:divide-gray-700">
+                <div class="flex pl-0 mt-3 space-x-1 sm:pl-2 sm:mt-0">
+                    <a href="/dashboard" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" title="Back to Dashboard">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                <% if (subscriptionInfo && subscriptionInfo.canCreateDevice) { %>
+                <button type="button" onclick="openCreateDeviceModal()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                    Create Device
+                </button>
+                <% } else { %>
+                <button type="button" disabled class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-400 bg-gray-300 rounded-lg cursor-not-allowed sm:w-auto dark:bg-gray-600 dark:text-gray-500">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                    Create Device (Limit Reached)
+                </button>
+                <% } %>
+                <button type="button" onclick="fetchDevices()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                    Refresh
+                </button>
+            </div>
       </div>
     </div>
-  </nav>
+</div>
 
-  <div class="container">
-    <!-- Create Device Section -->
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="bi bi-plus-circle"></i> Create New Device
-            </h5>
+<!-- Alert Messages -->
+<div id="alert-container" class="mb-4"></div>
+
+<!-- Subscription Info Card -->
+<% if (subscriptionInfo) { %>
+<!-- Subscription Info Navbar Style -->
+<div class="mb-6">
+  <nav class="flex flex-wrap items-center justify-center gap-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 px-4 py-3">
+    <!-- Plan -->
+    <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 dark:bg-blue-900">
+      <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span class="text-sm font-medium text-blue-800 dark:text-blue-200">Plan:</span>
+      <span class="text-base font-bold text-blue-900 dark:text-blue-100"><%= subscriptionInfo.subscriptionName %></span>
           </div>
-          <div class="card-body">
-            <form id="createDeviceForm">
-              <div class="mb-3">
-                <label for="alias" class="form-label">Device Alias</label>
+    <!-- Device Limit -->
+    <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900">
+      <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+      <span class="text-sm font-medium text-green-800 dark:text-green-200">Limit:</span>
+      <span class="text-base font-bold text-green-900 dark:text-green-100"><%= subscriptionInfo.limitDevice %></span>
+                        </div>
+    <!-- Used -->
+    <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-50 dark:bg-yellow-900">
+      <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+      <span class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Used:</span>
+      <span class="text-base font-bold text-yellow-900 dark:text-yellow-100" data-current-count><%= subscriptionInfo.currentDeviceCount %></span>
+                    </div>
+    <!-- Remaining -->
+    <div class="flex items-center gap-2 px-4 py-2 rounded-lg <%= subscriptionInfo.remainingDevices > 0 ? 'bg-purple-50 dark:bg-purple-900' : 'bg-red-50 dark:bg-red-900' %>">
+      <svg class="w-5 h-5 <%= subscriptionInfo.remainingDevices > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400' %>" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+      <span class="text-sm font-medium <%= subscriptionInfo.remainingDevices > 0 ? 'text-purple-800 dark:text-purple-200' : 'text-red-800 dark:text-red-200' %>">Remaining:</span>
+      <span class="text-base font-bold <%= subscriptionInfo.remainingDevices > 0 ? 'text-purple-900 dark:text-purple-100' : 'text-red-900 dark:text-red-100' %>" data-remaining-count><%= subscriptionInfo.remainingDevices %></span>
+                </div>
+  </nav>
+            <% if (!subscriptionInfo.canCreateDevice) { %>
+  <div class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-900 dark:border-red-600 dark:text-red-300">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    <strong>Device Limit Reached!</strong> You have reached your device limit. Please contact your administrator to upgrade your subscription.
+                </div>
+            </div>
+            <% } else { %>
+  <div class="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg dark:bg-green-900 dark:border-green-600 dark:text-green-300">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    <strong>You can create <%= subscriptionInfo.remainingDevices %> more device(s)</strong> under your current subscription plan.
+                </div>
+            </div>
+            <% } %>
+</div>
+<% } else { %>
+<div class="mb-6">
+    <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                No Active Subscription
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg dark:bg-yellow-900 dark:border-yellow-600 dark:text-yellow-300">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    <strong>No active subscription found.</strong> Please contact your administrator to subscribe to a plan before creating devices.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Instructions Card -->
+<div class="mb-6">
+    <div class="bg-white shadow rounded-lg dark:bg-gray-800">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                Getting Started
+            </h3>
+          </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-md font-semibold text-gray-900 dark:text-white mb-3">How to Create a Device</h4>
+                    <ol class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">1</span>
+                            <span>Click "Create Device" button above</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">2</span>
+                            <span>Enter a device name and optional phone number</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">3</span>
+                            <span>Scan the QR code with WhatsApp</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">4</span>
+                            <span>Wait for connection confirmation</span>
+                        </li>
+                    </ol>
+                </div>
+                <div>
+                    <h4 class="text-md font-semibold text-gray-900 dark:text-white mb-3">Tips</h4>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900 dark:border-blue-700">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                <span class="text-sm font-medium text-blue-800 dark:text-blue-200">Device Names</span>
+                            </div>
+                            <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">Use descriptive names like "Home Device" or "Office WhatsApp"</p>
+                        </div>
+                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900 dark:border-green-700">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                <span class="text-sm font-medium text-green-800 dark:text-green-200">Multiple Devices</span>
+                            </div>
+                            <p class="text-sm text-green-700 dark:text-green-300 mt-1">You can create multiple devices for different purposes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Device List -->
+<div class="bg-white shadow rounded-lg dark:bg-gray-800">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+            Your Devices
+        </h3>
+    </div>
+    <div class="p-6">
+        <div id="deviceList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Devices will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Create Device Modal -->
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="createDeviceModal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeCreateDeviceModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create New Device</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Add a new WhatsApp device to your account</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeCreateDeviceModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <form id="createDeviceForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="alias" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                Device Name *
+                            </label>
                 <input
                   type="text"
-                  class="form-control"
                   id="alias"
                   name="alias"
                   placeholder="Enter device name (e.g., My WhatsApp Device)"
                   required
+                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 />
+                            <p class="text-xs text-gray-500 mt-2">Choose a descriptive name for your device</p>
               </div>
-              <div class="mb-3">
-                <label for="phoneNumber" class="form-label">Phone Number</label>
+                        <div>
+                            <label for="phoneNumber" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                                Phone Number
+                            </label>
                 <input
                   type="tel"
-                  class="form-control"
                   id="phoneNumber"
                   name="phoneNumber"
                   placeholder="Enter phone number (e.g., +6281234567890)"
+                                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 />
-                <small class="text-muted">Optional: Enter the phone number for this device</small>
+                            <p class="text-xs text-gray-500 mt-2">Optional: Enter the phone number for this device</p>
               </div>
-              <button type="submit" class="btn btn-primary w-100">
-                <i class="bi bi-plus"></i> Create Device
-              </button>
-            </form>
           </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 dark:bg-blue-900 dark:border-blue-700">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                            <div>
+                                <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-1">What happens next?</h4>
+                                <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                                    <li>• A QR code will be generated for this device</li>
+                                    <li>• Scan the QR code with your WhatsApp mobile app</li>
+                                    <li>• The device will connect automatically once scanned</li>
+                                </ul>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="bi bi-info-circle"></i> Instructions
-            </h5>
           </div>
-          <div class="card-body">
-            <ol>
-              <li>Enter a device alias/name</li>
-              <li>Click "Create Device"</li>
-              <li>Scan the QR code with WhatsApp</li>
-              <li>Wait for connection confirmation</li>
-            </ol>
-            <div class="alert alert-info mt-3">
-              <i class="bi bi-lightbulb"></i>
-              <strong>Tip:</strong> Use descriptive names like "Home Device" or "Office WhatsApp"
+                </form>
             </div>
+            <div class="flex items-center justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="closeCreateDeviceModal()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    Cancel
+                </button>
+                <button type="submit" form="createDeviceForm" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:ring-4 focus:ring-blue-300 rounded-lg shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:focus:ring-blue-800">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                    Create Device
+                </button>
           </div>
         </div>
       </div>
-    </div>
-
-    <h2 class="mb-4">Daftar Device Anda</h2>
-    <div id="deviceList"></div>
   </div>
 
   <!-- QR Modal -->
-  <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="qrModalLabel">
-            <i class="bi bi-qr-code"></i> Scan QR Code
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="qrModalCloseBtn"></button>
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="qrModal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeQRModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"></path>
+                                <path d="M4 12a1 1 0 011-1h2a1 1 0 110 2H5a1 1 0 01-1-1zM15 11a1 1 0 100 2h1a1 1 0 100-2h-1z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">WhatsApp QR Code</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Scan with your WhatsApp mobile app</p>
+                        </div>
+                    </div>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white transition-colors" id="qrModalCloseBtn">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>  
+                </button>
         </div>
-        <div class="modal-body text-center">
-          <div id="modalQrContainer">
-            <div id="modalQrCode"></div>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="p-8">
+                <div class="text-center">
+                    <div id="modalQrContainer" class="mb-6">
+                        <div id="modalQrCode" class="inline-block p-4 bg-white rounded-lg shadow-inner border-2 border-gray-100 dark:bg-gray-100"></div>
           </div>
+                    
+                    <!-- Instructions -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 dark:bg-blue-900 dark:border-blue-700">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                            <div class="text-left">
+                                <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">How to connect:</h4>
+                                <ol class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                                    <li>1. Open WhatsApp on your phone</li>
+                                    <li>2. Tap Menu (⋮) > Settings > Linked devices</li>
+                                    <li>3. Tap "Link a device"</li>
+                                    <li>4. Scan this QR code with your phone</li>
+                                </ol>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-warning" id="reloadQrBtn">
-            <i class="bi bi-arrow-clockwise"></i> Reload QR
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-between px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    QR code expires in 20 seconds
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" id="reloadQrBtn" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus:ring-4 focus:ring-yellow-300 rounded-lg shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:focus:ring-yellow-800">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                    Reload QR
           </button>
-          <button type="button" class="btn btn-danger" id="cancelQrBtn">
-            <i class="bi bi-x-circle"></i> Cancel
+                    <button type="button" id="cancelQrBtn" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Device Modal -->
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="deleteDeviceModal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeDeleteDeviceModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-red-50 to-pink-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-red-500 to-pink-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Delete Device</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeDeleteDeviceModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Modal body -->
+            <div class="px-6 py-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-red-900">
+                        <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Are you sure?</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-6">This will permanently delete the device and all associated data. This action cannot be undone.</p>
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="closeDeleteDeviceModal()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    No, cancel
+                </button>
+                <button type="button" onclick="confirmDeleteDevice()" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 focus:ring-4 focus:ring-red-300 rounded-lg shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:focus:ring-red-800">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Yes, I'm sure
           </button>
         </div>
       </div>
     </div>
   </div>
 
+    <style>
+        .bg-primary-50 { background-color: #eff6ff; }
+        .bg-primary-100 { background-color: #dbeafe; }
+        .bg-primary-500 { background-color: #3b82f6; }
+        .bg-primary-600 { background-color: #2563eb; }
+        .bg-primary-700 { background-color: #1d4ed8; }
+        .bg-primary-800 { background-color: #1e40af; }
+        .text-primary-600 { color: #2563eb; }
+        .text-primary-700 { color: #1d4ed8; }
+        .border-primary-300 { border-color: #93c5fd; }
+        .border-primary-500 { border-color: #3b82f6; }
+        .focus\:ring-primary-300:focus { box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5); }
+        .focus\:ring-primary-500:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); }
+        .focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+        .focus\:border-primary-500:focus { border-color: #3b82f6; }
+        .hover\:bg-primary-800:hover { background-color: #1e40af; }
+        .hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .dark .dark\:bg-primary-600 { background-color: #2563eb; }
+        .dark .dark\:hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .dark .dark\:focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+        .dark .dark\:focus\:ring-primary-600:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5); }
+        
+        .device-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .device-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .device-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #3b82f6;
+        }
+        .device-card:hover::before {
+            opacity: 1;
+        }
+        .dark .device-card {
+            background-color: #1f2937;
+            border-color: #374151;
+        }
+        .dark .device-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-connected {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .status-connecting {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .status-disconnected {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .status-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .dark .status-connected {
+            background-color: #14532d;
+            color: #22c55e;
+            border-color: #16a34a;
+        }
+        .dark .status-pending {
+            background-color: #451a03;
+            color: #f59e0b;
+            border-color: #d97706;
+        }
+        .dark .status-connecting {
+            background-color: #1e3a8a;
+            color: #3b82f6;
+            border-color: #2563eb;
+        }
+        .dark .status-disconnected {
+            background-color: #7f1d1d;
+            color: #ef4444;
+            border-color: #dc2626;
+        }
+        .dark .status-error {
+            background-color: #7f1d1d;
+            color: #ef4444;
+            border-color: #dc2626;
+        }
+
+        .device-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .device-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+        
+        .device-info-item {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .device-info-item:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .dark .device-info-item {
+            background-color: #374151;
+            border-color: #4b5563;
+        }
+        .dark .device-info-item:hover {
+            background-color: #4b5563;
+            border-color: #6b7280;
+        }
+        
+        .device-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .device-actions button,
+        .device-actions a {
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+        
+        /* Gradient backgrounds for buttons */
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops));
+        }
+        .from-indigo-500 {
+            --tw-gradient-from: #6366f1;
+            --tw-gradient-to: rgb(99 102 241 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-purple-600 {
+            --tw-gradient-to: #9333ea;
+        }
+        .hover\:from-indigo-600:hover {
+            --tw-gradient-from: #4f46e5;
+        }
+        .hover\:to-purple-700:hover {
+            --tw-gradient-to: #7c3aed;
+        }
+        .from-blue-500 {
+            --tw-gradient-from: #3b82f6;
+            --tw-gradient-to: rgb(59 130 246 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-indigo-600 {
+            --tw-gradient-to: #4f46e5;
+        }
+        .hover\:from-blue-600:hover {
+            --tw-gradient-from: #2563eb;
+        }
+        .hover\:to-indigo-700:hover {
+            --tw-gradient-to: #4338ca;
+        }
+        .from-yellow-500 {
+            --tw-gradient-from: #eab308;
+            --tw-gradient-to: rgb(234 179 8 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-orange-500 {
+            --tw-gradient-to: #f97316;
+        }
+        .hover\:from-yellow-600:hover {
+            --tw-gradient-from: #ca8a04;
+        }
+        .hover\:to-orange-600:hover {
+            --tw-gradient-to: #ea580c;
+        }
+        
+        /* Backdrop blur effect */
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Transform scale effect */
+        .hover\:scale-105:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Enhanced shadows */
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .shadow-inner {
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Gradient header backgrounds */
+        .from-indigo-50 {
+            --tw-gradient-from: #eef2ff;
+            --tw-gradient-to: rgb(238 242 255 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-purple-50 {
+            --tw-gradient-to: #faf5ff;
+        }
+        .from-blue-50 {
+            --tw-gradient-from: #eff6ff;
+            --tw-gradient-to: rgb(239 246 255 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-indigo-50 {
+            --tw-gradient-to: #eef2ff;
+        }
+        .dark .dark\:from-gray-700 {
+            --tw-gradient-from: #374151;
+            --tw-gradient-to: rgb(55 65 81 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .dark .dark\:to-gray-800 {
+            --tw-gradient-to: #1f2937;
+        }
+    </style>
+
   <!-- Add QR Code library -->
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
-  <!-- Add Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Alert function -->
+    <script>
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alert-container');
+            if (!alertContainer) return;
+
+            const alertTypes = {
+                success: 'bg-green-100 border-green-500 text-green-700 dark:bg-green-900 dark:border-green-600 dark:text-green-300',
+                error: 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900 dark:border-red-600 dark:text-red-300',
+                warning: 'bg-yellow-100 border-yellow-500 text-yellow-700 dark:bg-yellow-900 dark:border-yellow-600 dark:text-yellow-300',
+                info: 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900 dark:border-blue-600 dark:text-blue-300'
+            };
+
+            const iconTypes = {
+                success: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+                error: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+                warning: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+                info: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>'
+            };
+
+            const alertId = 'alert-' + Date.now();
+            const alertElement = document.createElement('div');
+            alertElement.id = alertId;
+            alertElement.className = `flex items-center p-4 mb-4 border rounded-lg ${alertTypes[type] || alertTypes.info}`;
+            alertElement.innerHTML = `
+                <div class="flex-shrink-0">
+                    ${iconTypes[type] || iconTypes.info}
+                </div>
+                <div class="ml-3 text-sm font-medium">
+                    ${message}
+                </div>
+                <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:hover:bg-gray-700" onclick="document.getElementById('${alertId}').remove()">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+
+            alertContainer.appendChild(alertElement);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (document.getElementById(alertId)) {
+                    document.getElementById(alertId).remove();
+                }
+            }, 5000);
+        }
+    </script>
 
   <!-- JS Section -->
   <script>
@@ -159,29 +742,30 @@
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Device Management loaded');
-      
-      // Event listeners
-      document.getElementById('createDeviceForm').addEventListener('submit', createDevice);
-      document.getElementById('qrModalCloseBtn').addEventListener('click', handleQRCancel);
-      document.getElementById('cancelQrBtn').addEventListener('click', handleQRCancel);
-      document.getElementById('reloadQrBtn').addEventListener('click', handleQRReload);
-      
-      const qrModal = document.getElementById('qrModal');
-      qrModal.addEventListener('hidden.bs.modal', handleQRCancel);
 
       // Initial fetch
       fetchDevices();
+
+      // Set up periodic refresh for real-time sync (every 30 seconds)
+      setInterval(() => {
+        console.log('Refreshing device and subscription data...');
+        updateSubscriptionInfo();
+      }, 30000);
     });
 
     // Fetch devices from API
     async function fetchDevices() {
       try {
-        const response = await fetch(API_BASE_URL + '/devices', {
+        // Use WhatsApp API directly for device listing
+        const response = await fetch('http://localhost:5000/api/whatsapp/devices', {
         headers: {
           'X-API-Token': API_TOKEN
         }
       });
         const result = await response.json();
+
+        // Update subscription info display if available
+        await updateSubscriptionInfo();
 
         if (!result.success) {
           document.getElementById('deviceList').innerHTML = '<div class="alert alert-danger">Gagal memuat device.</div>';
@@ -193,7 +777,18 @@
         container.innerHTML = '';
 
         if (devices.length === 0) {
-          container.innerHTML = '<div class="alert alert-info">Belum ada device. Silakan buat device baru di atas.</div>';
+          container.innerHTML = `
+            <div class="col-span-full text-center py-12">
+              <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 dark:bg-gray-700">
+                <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-3 dark:text-white">No devices yet</h3>
+              <p class="text-gray-500 dark:text-gray-400 mb-6">Start by creating your first WhatsApp device to get started.</p>
+              <button type="button" onclick="openCreateDeviceModal()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                Create Your First Device
+              </button>
+            </div>`;
           return;
         }
 
@@ -206,26 +801,55 @@
 
           let qrButton = '';
           if (device.status !== 'connected') {
-            qrButton = '<button type="button" class="btn btn-warning btn-sm" onclick="showQRModal(\'' + device.id + '\', \'' + device.sessionId + '\', \'' + device.alias + '\')">' +
-                      '<i class="bi bi-qr-code"></i> Show QR</button>';
+            qrButton = `
+              <button type="button" onclick="showQRModal('${device.id}', '${device.sessionId}', '${device.alias}')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg hover:from-indigo-600 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:from-indigo-600 dark:to-purple-700 dark:hover:from-indigo-700 dark:hover:to-purple-800 dark:focus:ring-indigo-800">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"></path>
+                  <path d="M4 12a1 1 0 011-1h2a1 1 0 110 2H5a1 1 0 01-1-1zM15 11a1 1 0 100 2h1a1 1 0 100-2h-1z"></path>
+                </svg>
+                Show QR Code
+              </button>`;
           }
 
-          card.innerHTML = 
-            '<div class="device-header">' +
-              statusEmoji + ' ' + device.alias + ' ' + (device.phoneNumber ? '(' + device.phoneNumber + ')' : '') +
-              '<span class="badge ' + statusBadge + ' ms-2">' + device.status + '</span>' +
-            '</div>' +
-            '<p><strong>Session ID:</strong> ' + (device.sessionId || 'N/A') + '</p>' +
-            '<p><strong>AI Enabled:</strong> ' + (device.aiEnabled ? 'Yes' : 'No') + '</p>' +
-            '<div class="btn-group w-100" role="group">' +
-              '<a href="/dashboard/devices/' + device.id + '/settings" class="btn btn-info btn-sm">' +
-                '<i class="bi bi-sliders"></i> Settings' +
-              '</a>' +
-              qrButton +
-              '<button type="button" class="btn btn-danger btn-sm" onclick="deleteDevice(\'' + device.id + '\')">' +
-                '<i class="bi bi-trash"></i> Delete' +
-              '</button>' +
-            '</div>';
+          card.innerHTML = `
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center space-x-3">
+                <div class="device-icon">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                    ${device.alias}
+                  </h4>
+                  <div class="flex items-center space-x-2 mt-1">
+                    <span class="status-badge status-${device.status}">${device.status}</span>
+                    ${device.phoneNumber ? `<span class="text-sm text-gray-500 dark:text-gray-400">${device.phoneNumber}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <div class="text-2xl">
+                ${statusEmoji}
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <div class="device-info-item">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">AI Enabled</p>
+                <p class="text-sm text-gray-900 dark:text-white">${device.aiEnabled ? 'Yes' : 'No'}</p>
+              </div>
+            </div>
+            
+            <div class="device-actions">
+              <a href="/dashboard/devices/${device.id}/settings" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                Settings
+              </a>
+              ${qrButton}
+              <button type="button" onclick="deleteDevice('${device.id}')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                Delete
+              </button>
+            </div>`;
 
           container.appendChild(card);
         });
@@ -242,16 +866,190 @@
                           errorMessage = 'Cannot connect to API server. Please check if the server is running.';
         }
         
-        document.getElementById('deviceList').innerHTML = 
-          '<div class="alert alert-danger">' + 
-            '<strong>Error:</strong> ' + errorMessage + 
-          '</div>';
+        document.getElementById('deviceList').innerHTML = `
+          <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-900 dark:border-red-600 dark:text-red-300">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+              <strong>Error:</strong> ${errorMessage}
+            </div>
+          </div>`;
+      }
+    }
+
+    // Update subscription info display with real-time data
+    async function updateSubscriptionInfo() {
+      try {
+        const limitCheck = await checkDeviceLimit();
+        if (limitCheck.success && limitCheck.subscriptionInfo) {
+          const info = limitCheck.subscriptionInfo;
+          
+          // Update device count display if elements exist
+          const currentCountElement = document.querySelector('[data-current-count]');
+          const remainingCountElement = document.querySelector('[data-remaining-count]');
+          
+          if (currentCountElement) {
+            currentCountElement.textContent = `${info.currentDeviceCount} devices`;
+          }
+          
+          if (remainingCountElement) {
+            remainingCountElement.textContent = `${info.remainingDevices} devices`;
+            
+            // Update color based on remaining devices
+            const parentCard = remainingCountElement.closest('.border');
+            if (parentCard) {
+              if (info.remainingDevices > 0) {
+                parentCard.className = parentCard.className.replace(/bg-red-\d+|border-red-\d+/g, '');
+                parentCard.className = parentCard.className.replace(/dark:bg-red-\d+|dark:border-red-\d+/g, '');
+                if (!parentCard.className.includes('bg-purple-')) {
+                  parentCard.classList.add('bg-purple-50', 'border-purple-200', 'dark:bg-purple-900', 'dark:border-purple-700');
+                }
+              } else {
+                parentCard.className = parentCard.className.replace(/bg-purple-\d+|border-purple-\d+/g, '');
+                parentCard.className = parentCard.className.replace(/dark:bg-purple-\d+|dark:border-purple-\d+/g, '');
+                if (!parentCard.className.includes('bg-red-')) {
+                  parentCard.classList.add('bg-red-50', 'border-red-200', 'dark:bg-red-900', 'dark:border-red-700');
+                }
+              }
+            }
+          }
+          
+          // Update create button state based on real-time check
+          updateCreateButtonState(info.remainingDevices > 0);
+          
+          console.log('Subscription info updated with real-time data:', info);
+        }
+      } catch (error) {
+        console.error('Error updating subscription info:', error);
+      }
+    }
+
+    // Update create button state
+    function updateCreateButtonState(canCreate) {
+      const createButtons = document.querySelectorAll('button[onclick="openCreateDeviceModal()"]');
+      createButtons.forEach(button => {
+        if (canCreate) {
+          button.disabled = false;
+          button.className = button.className.replace(/bg-gray-\d+|text-gray-\d+|cursor-not-allowed/g, '');
+          if (!button.className.includes('bg-primary-')) {
+            button.classList.add('bg-primary-700', 'hover:bg-primary-800', 'text-white');
+          }
+          button.innerHTML = `
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+            Create Device
+          `;
+        } else {
+          button.disabled = true;
+          button.className = button.className.replace(/bg-primary-\d+|hover:bg-primary-\d+|text-white/g, '');
+          if (!button.className.includes('bg-gray-')) {
+            button.classList.add('bg-gray-300', 'text-gray-400', 'cursor-not-allowed');
+          }
+          button.innerHTML = `
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+            Create Device (Limit Reached)
+          `;
+        }
+      });
+    }
+
+    // Check device limit with real-time API calls
+    async function checkDeviceLimit() {
+      try {
+        // Get subscription info
+        const subscriptionResponse = await fetch('/dashboard/devices/check-limit', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!subscriptionResponse.ok) {
+          throw new Error(`HTTP ${subscriptionResponse.status}`);
+        }
+
+        const subscriptionResult = await subscriptionResponse.json();
+        console.log('Subscription check result:', subscriptionResult);
+
+        if (!subscriptionResult.success || !subscriptionResult.subscriptionInfo) {
+          return {
+            success: false,
+            canCreate: false,
+            message: subscriptionResult.message || 'No active subscription found.',
+            subscriptionInfo: null
+          };
+        }
+
+        // Get actual device count from WhatsApp API
+        let actualDeviceCount = 0;
+        try {
+          const deviceResponse = await fetch('http://localhost:5000/api/whatsapp/devices', {
+            headers: {
+              'X-API-Token': API_TOKEN
+            }
+          });
+
+          if (deviceResponse.ok) {
+            const deviceResult = await deviceResponse.json();
+            if (deviceResult.success && deviceResult.data && deviceResult.data.devices) {
+              actualDeviceCount = deviceResult.data.devices.length;
+              console.log('Actual device count from WhatsApp API:', actualDeviceCount);
+            }
+          } else {
+            console.warn('WhatsApp API not available, using subscription service count');
+            actualDeviceCount = subscriptionResult.subscriptionInfo.currentDeviceCount;
+          }
+        } catch (error) {
+          console.error('Error fetching from WhatsApp API:', error);
+          // Fall back to subscription service count
+          actualDeviceCount = subscriptionResult.subscriptionInfo.currentDeviceCount;
+        }
+
+        const limitDevice = subscriptionResult.subscriptionInfo.limitDevice;
+        const remainingDevices = Math.max(0, limitDevice - actualDeviceCount);
+        const canCreate = actualDeviceCount < limitDevice;
+
+        console.log('Device limit validation:', {
+          actualDeviceCount,
+          limitDevice,
+          remainingDevices,
+          canCreate
+        });
+
+        return {
+          success: true,
+          canCreate: canCreate,
+          message: canCreate ? 
+            `You can create ${remainingDevices} more device(s)` : 
+            'Device limit reached. Please upgrade your subscription.',
+          subscriptionInfo: {
+            ...subscriptionResult.subscriptionInfo,
+            currentDeviceCount: actualDeviceCount,
+            remainingDevices: remainingDevices
+          }
+        };
+
+      } catch (error) {
+        console.error('Error checking device limit:', error);
+        return {
+          success: false,
+          canCreate: false,
+          message: 'Unable to verify device limit. Please try again.',
+          subscriptionInfo: null
+        };
       }
     }
 
     // Create new device
     async function createDevice(e) {
       e.preventDefault();
+
+      // Check device limit first
+      const limitCheck = await checkDeviceLimit();
+      if (!limitCheck.success || !limitCheck.canCreate) {
+        showAlert(limitCheck.message, 'error');
+        closeCreateDeviceModal();
+        return;
+      }
+
       const form = e.target;
       const formData = new FormData(form);
       const alias = formData.get('alias');
@@ -260,9 +1058,11 @@
       console.log('Creating device with:', { userId: USER_ID, alias, phoneNumber, token: API_TOKEN, url: API_BASE_URL });
 
       try {
-        const submitBtn = form.querySelector('button[type="submit"]');
+        const submitBtn = document.querySelector('#createDeviceModal button[type="submit"]');
+        if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+          submitBtn.innerHTML = '<div class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>Creating...';
+        }
 
         const requestBody = {
           userId: USER_ID,
@@ -331,11 +1131,29 @@
           }
         } else {
           console.error('No device or sessionId in response:', result);
-          alert('Device created but no session information received. Please refresh the page.');
+          showAlert('Device created but no session information received. Please refresh the page.', 'warning');
         }
 
         // Refresh device list
         fetchDevices();
+        
+        // Close create device modal
+        closeCreateDeviceModal();
+
+        // Update subscription info immediately
+        await updateSubscriptionInfo();
+
+        // Show success message with updated limit info
+        const updatedLimitCheck = await checkDeviceLimit();
+        if (updatedLimitCheck.success && updatedLimitCheck.subscriptionInfo) {
+          const info = updatedLimitCheck.subscriptionInfo;
+          showAlert(
+            `Device created successfully! You have ${info.remainingDevices} device(s) remaining out of ${info.limitDevice} total.`, 
+            'success'
+          );
+        } else {
+          showAlert('Device created successfully!', 'success');
+        }
 
       } catch (error) {
         console.error('Error creating device:', error);
@@ -354,17 +1172,18 @@
           errorMessage = 'Network error: Cannot connect to API server. Please check if the server is running.';
         }
         
-        alert('Error creating device: ' + errorMessage);
+        showAlert('Error creating device: ' + errorMessage, 'error');
       } finally {
-        const submitBtn = form.querySelector('button[type="submit"]');
+        const submitBtn = document.querySelector('#createDeviceModal button[type="submit"]');
+        if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="bi bi-plus"></i> Create Device';
+          submitBtn.innerHTML = '<svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>Create Device';
+        }
       }
     }
 
     // Show QR Modal for new device (following contoh.ejs pattern)
     async function showQRModalForNewDevice(device, immediateQR = null) {
-      const modal = new bootstrap.Modal(document.getElementById('qrModal'));
       const qrContainer = document.getElementById('modalQrContainer');
       const reloadBtn = document.getElementById('reloadQrBtn');
 
@@ -372,28 +1191,32 @@
       reloadBtn.dataset.deviceId = device.id;
       reloadBtn.dataset.sessionId = device.sessionId;
 
-      modal.show();
+      // Show modal
+      document.getElementById('qrModal').classList.remove('hidden');
 
       if (immediateQR) {
         // Display immediate QR code from API response
-        qrContainer.innerHTML = 
-          '<div class="text-center">' +
-            '<p class="text-success"><i class="bi bi-wifi"></i> Device Created Successfully</p>' +
-            '<p>Scan this QR code with WhatsApp</p>' +
-            '<img src="data:image/png;base64,' + immediateQR + '" class="img-fluid" style="max-width: 300px;" />' +
-            '<p class="text-muted mt-2">Session: ' + device.sessionId + '</p>' +
-            '<small class="text-info">QR code received immediately</small>' +
-          '</div>';
+        qrContainer.innerHTML = `
+          <div class="text-center">
+            <p class="text-green-600 dark:text-green-400 font-medium">
+              <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+              Device Created Successfully
+            </p>
+            <p class="text-gray-700 dark:text-gray-300">Scan this QR code with WhatsApp</p>
+            <img src="data:image/png;base64,${immediateQR}" class="mx-auto max-w-xs rounded-lg shadow-lg" style="max-width: 300px;" />
+            <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Session: ${device.sessionId}</p>
+            <small class="text-blue-600 dark:text-blue-400">QR code received immediately</small>
+          </div>`;
         console.log('QR code displayed for session:', device.sessionId);
       } else {
         // Show loading state and wait for WebSocket or fetch from API
-        qrContainer.innerHTML = 
-          '<div class="text-center">' +
-            '<div class="spinner-border text-primary" role="status">' +
-              '<span class="visually-hidden">Loading QR Code...</span>' +
-            '</div>' +
-            '<p class="mt-2">Waiting for QR code...</p>' +
-          '</div>';
+        qrContainer.innerHTML = `
+          <div class="text-center">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-primary-600 rounded-full mb-3" role="status">
+              <span class="sr-only">Loading QR Code...</span>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400">Waiting for QR code...</p>
+          </div>`;
 
         try {
           const response = await fetch(API_BASE_URL + '/devices/' + device.id + '/qr', {
@@ -405,61 +1228,51 @@
           if (response.ok) {
             const data = await response.json();
             if (data.qrCode) {
-              qrContainer.innerHTML = 
-                '<div class="text-center">' +
-                  '<p>Scan this QR code with WhatsApp</p>' +
-                  '<img src="' + data.qrCode + '" class="img-fluid" style="max-width: 300px;" />' +
-                  '<p class="text-muted mt-2">Session: ' + device.sessionId + '</p>' +
-                '</div>';
+              qrContainer.innerHTML = `
+                <div class="text-center">
+                  <p class="text-gray-700 dark:text-gray-300">Scan this QR code with WhatsApp</p>
+                  <img src="${data.qrCode}" class="mx-auto max-w-xs rounded-lg shadow-lg" style="max-width: 300px;" />
+                  <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Session: ${device.sessionId}</p>
+                </div>`;
               console.log('QR code loaded for session:', device.sessionId);
             } else {
-              qrContainer.innerHTML = 
-                '<div class="alert alert-warning">QR code not available. Device may already be connected.</div>';
+              qrContainer.innerHTML = `
+                <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg dark:bg-yellow-900 dark:border-yellow-600 dark:text-yellow-300">
+                  <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    QR code not available. Device may already be connected.
+                  </div>
+                </div>`;
             }
           } else {
-            qrContainer.innerHTML = 
-              '<div class="text-center">' +
-                '<div class="spinner-border text-primary mb-3" role="status">' +
-                  '<span class="visually-hidden">Waiting for QR Code...</span>' +
-                '</div>' +
-                '<p>Waiting for QR code via WebSocket...</p>' +
-                '<p class="text-muted">Session: ' + device.sessionId + '</p>' +
-                '<small class="text-info">Using WebSocket connection</small>' +
-              '</div>';
+            qrContainer.innerHTML = `
+              <div class="text-center">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-primary-600 rounded-full mb-3" role="status">
+                  <span class="sr-only">Waiting for QR Code...</span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">Waiting for QR code via WebSocket...</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Session: ${device.sessionId}</p>
+                <small class="text-blue-600 dark:text-blue-400">Using WebSocket connection</small>
+              </div>`;
           }
         } catch (error) {
           console.error('Failed to load QR code:', error.message);
-          qrContainer.innerHTML = 
-            '<div class="text-center">' +
-              '<div class="spinner-border text-primary mb-3" role="status">' +
-                '<span class="visually-hidden">Waiting for QR Code...</span>' +
-              '</div>' +
-              '<p>Waiting for QR code via WebSocket...</p>' +
-              '<p class="text-muted">Session: ' + device.sessionId + '</p>' +
-              '<small class="text-info">Using WebSocket connection</small>' +
-            '</div>';
+          qrContainer.innerHTML = `
+            <div class="text-center">
+              <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-primary-600 rounded-full mb-3" role="status">
+                <span class="sr-only">Waiting for QR Code...</span>
+              </div>
+              <p class="text-gray-600 dark:text-gray-400">Waiting for QR code via WebSocket...</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">Session: ${device.sessionId}</p>
+              <small class="text-blue-600 dark:text-blue-400">Using WebSocket connection</small>
+            </div>`;
         }
       }
     }
 
     // Show QR Modal for existing device
     function showQRModal(deviceId, sessionId, alias) {
-      const modal = new bootstrap.Modal(document.getElementById('qrModal'));
-      const qrContainer = document.getElementById('modalQrContainer');
-      
-      currentDeviceSession = sessionId;
-      modal.show();
-
-      qrContainer.innerHTML = 
-        '<div class="text-center">' +
-          '<div class="spinner-border text-primary mb-3" role="status">' +
-            '<span class="visually-hidden">Loading QR Code...</span>' +
-          '</div>' +
-          '<p>Loading QR code for ' + alias + '...</p>' +
-        '</div>';
-
-      // Connect WebSocket for QR updates
-      connectDeviceWebSocket(sessionId);
+      openQRModal(deviceId, sessionId, alias);
     }
 
     // Update QR Modal with WebSocket data (following contoh.ejs pattern)
@@ -468,13 +1281,16 @@
 
       if (data.qr) {
         // Use QRCode library to generate QR code from text data
-        qrContainer.innerHTML = 
-          '<div class="text-center">' +
-            '<p>Scan this QR code with WhatsApp</p>' +
-            '<div id="modalQrCodeCanvas" style="display: inline-block;"></div>' +
-            '<p class="text-muted mt-2">Session: ' + data.sessionId + '</p>' +
-            '<p class="text-success"><i class="bi bi-wifi"></i> Connected via Device WebSocket</p>' +
-          '</div>';
+        qrContainer.innerHTML = `
+          <div class="text-center">
+            <p class="text-gray-700 dark:text-gray-300">Scan this QR code with WhatsApp</p>
+            <div id="modalQrCodeCanvas" class="inline-block"></div>
+            <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Session: ${data.sessionId}</p>
+            <p class="text-green-600 dark:text-green-400 font-medium">
+              <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+              Connected via Device WebSocket
+            </p>
+          </div>`;
 
         // Generate QR code using QRCode library
         const generateQR = () => {
@@ -493,11 +1309,11 @@
               console.log('QR code generated for session:', data.sessionId);
             } catch (error) {
               console.error('Error generating QR code:', error);
-              qrContainer.innerHTML = 
-                '<div class="alert alert-danger text-center">' +
-                  '<p>Error generating QR code</p>' +
-                  '<small>' + error.message + '</small>' +
-                '</div>';
+              qrContainer.innerHTML = `
+                <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-900 dark:border-red-600 dark:text-red-300 text-center">
+                  <p class="font-medium">Error generating QR code</p>
+                  <small>${error.message}</small>
+                </div>`;
             }
           } else {
             console.log('QRCode library not ready, retrying...');
@@ -508,11 +1324,11 @@
 
         console.log('QR code received via Device WebSocket:', data.sessionId);
       } else {
-        qrContainer.innerHTML = 
-          '<div class="alert alert-warning text-center">' +
-            '<p>QR code not available</p>' +
-            '<p class="text-muted">Session: ' + data.sessionId + '</p>' +
-          '</div>';
+        qrContainer.innerHTML = `
+          <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg dark:bg-yellow-900 dark:border-yellow-600 dark:text-yellow-300 text-center">
+            <p class="font-medium">QR code not available</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Session: ${data.sessionId}</p>
+          </div>`;
       }
     }
 
@@ -569,7 +1385,7 @@
                   }
                   // Refresh sessions list
                   fetchDevices();
-                  alert('Device connected successfully!');
+                  showAlert('Device connected successfully!', 'success');
                 } else if (data.status) {
                   // Handle other status updates (connecting, pending, etc.)
                   console.log('Device status:', data.status, { sessionId: data.sessionId });
@@ -607,13 +1423,13 @@
 
       if (deviceId && sessionId) {
         const qrContainer = document.getElementById('modalQrContainer');
-        qrContainer.innerHTML = 
-          '<div class="text-center">' +
-            '<div class="spinner-border text-primary" role="status">' +
-              '<span class="visually-hidden">Reloading QR Code...</span>' +
-            '</div>' +
-            '<p>Reloading QR code...</p>' +
-          '</div>';
+        qrContainer.innerHTML = `
+          <div class="text-center">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-primary-600 rounded-full mb-3" role="status">
+              <span class="sr-only">Reloading QR Code...</span>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400">Reloading QR code...</p>
+          </div>`;
 
         // Reconnect WebSocket
         connectDeviceWebSocket(sessionId);
@@ -621,33 +1437,23 @@
     }
 
     function handleQRCancel() {
-      if (currentDeviceSession) {
-        console.log('Cancelling session:', currentDeviceSession);
-        
-        if (deviceWs && deviceWs.readyState === WebSocket.OPEN) {
-          deviceWs.close(1000, 'User cancelled');
-          deviceWs = null;
-        }
-        
-        currentDeviceSession = null;
-      }
-
-      const modal = bootstrap.Modal.getInstance(document.getElementById('qrModal'));
-      if (modal) {
-        modal.hide();
-      }
+      closeQRModal();
     }
 
     function hideQRModal() {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('qrModal'));
-      if (modal) {
-        modal.hide();
-      }
+      closeQRModal();
     }
 
     // Delete device function
-    async function deleteDevice(deviceId) {
-      if (!confirm('Are you sure you want to delete this device? This action cannot be undone.')) return;
+    function deleteDevice(deviceId) {
+      // Store deviceId globally for use in confirmDelete
+      window.deviceToDelete = deviceId;
+      document.getElementById('deleteDeviceModal').classList.remove('hidden');
+    }
+
+    async function confirmDeleteDevice() {
+      const deviceId = window.deviceToDelete;
+      if (!deviceId) return;
 
       try {
         const response = await fetch(API_BASE_URL + '/devices/' + deviceId, {
@@ -659,26 +1465,33 @@
 
         const result = await response.json();
         if (result.success) {
-          alert('Device deleted successfully!');
+          showAlert('Device deleted successfully!', 'success');
           fetchDevices(); // Refresh list
         } else {
-          alert('Failed to delete device: ' + (result.error || 'Unknown error'));
+          showAlert('Failed to delete device: ' + (result.error || 'Unknown error'), 'error');
         }
       } catch (error) {
         console.error('Error deleting device:', error);
-        alert('Error deleting device: ' + error.message);
+        showAlert('Error deleting device: ' + error.message, 'error');
+      } finally {
+        closeDeleteDeviceModal();
       }
+    }
+
+    function closeDeleteDeviceModal() {
+      document.getElementById('deleteDeviceModal').classList.add('hidden');
+      window.deviceToDelete = null;
     }
 
     // Utility functions
     function getStatusBadge(status) {
       switch (status) {
-        case 'connected': return 'bg-success';
-        case 'pending': return 'bg-warning';
-        case 'connecting': return 'bg-info';
-        case 'disconnected': return 'bg-danger';
-        case 'error': return 'bg-danger';
-        default: return 'bg-secondary';
+        case 'connected': return 'status-connected';
+        case 'pending': return 'status-pending';
+        case 'connecting': return 'status-connecting';
+        case 'disconnected': return 'status-disconnected';
+        case 'error': return 'status-error';
+        default: return 'status-disconnected';
       }
     }
 
@@ -694,7 +1507,108 @@
     }
   </script>
   
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Modal management functions -->
+    <script>
+        // Create Device Modal management
+        async function openCreateDeviceModal() {
+            // Show loading state on button
+            const createBtn = event.target;
+            const originalContent = createBtn.innerHTML;
+            createBtn.disabled = true;
+            createBtn.innerHTML = `
+                <div class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
+                Checking limit...
+            `;
+
+            try {
+                // Check device limit in real-time before opening modal
+                const limitCheck = await checkDeviceLimit();
+                
+                if (!limitCheck.success || !limitCheck.canCreate) {
+                    showAlert(limitCheck.message, 'error');
+                    return;
+                }
+                
+                document.getElementById('createDeviceModal').classList.remove('hidden');
+                // Reset form
+                document.getElementById('createDeviceForm').reset();
+            } catch (error) {
+                console.error('Error checking device limit:', error);
+                showAlert('Unable to verify device limit. Please try again.', 'error');
+            } finally {
+                // Restore button state
+                createBtn.disabled = false;
+                createBtn.innerHTML = originalContent;
+            }
+        }
+
+        function closeCreateDeviceModal() {
+            document.getElementById('createDeviceModal').classList.add('hidden');
+        }
+
+        // QR Modal management
+        function openQRModal(deviceId, sessionId, alias) {
+            document.getElementById('qrModal').classList.remove('hidden');
+            currentDeviceSession = sessionId;
+            
+            const qrContainer = document.getElementById('modalQrContainer');
+            qrContainer.innerHTML = `
+                <div class="text-center">
+                    <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-primary-600 rounded-full mb-3" role="status">
+                        <span class="sr-only">Loading QR Code...</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400">Loading QR code for ${alias}...</p>
+                </div>`;
+
+            // Connect WebSocket for QR updates
+            connectDeviceWebSocket(sessionId);
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.add('hidden');
+            if (currentDeviceSession) {
+                if (deviceWs && deviceWs.readyState === WebSocket.OPEN) {
+                    deviceWs.close(1000, 'User cancelled');
+                    deviceWs = null;
+                }
+                currentDeviceSession = null;
+            }
+        }
+
+        // Event listeners for modals
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create Device Modal
+            document.getElementById('createDeviceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                createDevice(e);
+                closeCreateDeviceModal();
+            });
+
+            // QR Modal
+            document.getElementById('qrModalCloseBtn').addEventListener('click', closeQRModal);
+            document.getElementById('cancelQrBtn').addEventListener('click', closeQRModal);
+            document.getElementById('reloadQrBtn').addEventListener('click', handleQRReload);
+            
+            // Close modals when clicking outside
+            document.getElementById('createDeviceModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCreateDeviceModal();
+                }
+            });
+            
+            document.getElementById('qrModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeQRModal();
+                }
+            });
+            
+            // Delete Device Modal
+            document.getElementById('deleteDeviceModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteDeviceModal();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

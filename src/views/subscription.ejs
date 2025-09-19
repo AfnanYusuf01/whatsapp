@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <%- include('./layouts/partials/header.ejs') %>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+  <%- include('./layouts/partials/navbar-landing.ejs') %>
+  
+  <div class="container px-4 pt-24 mx-auto md:pt-32 lg:px-0 dark:bg-gray-900">
+    <h1 class="mb-3 text-3xl font-bold text-gray-900 sm:text-4xl sm:leading-none sm:tracking-tight dark:text-white">
+      Our subscription plans made simple
+    </h1>
+    <p class="mb-6 text-lg font-normal text-gray-500 sm:text-xl dark:text-gray-400">
+      Choose the perfect plan for your WhatsApp Business needs. Scale your communication with our professional features and premium support.
+    </p>
+    
+    <!-- Billing Toggle -->
+    <div class="flex items-center mb-8">
+      <span class="text-base font-medium text-gray-900 dark:text-white">
+        Monthly
+      </span>
+      <!-- Switch Container -->
+      <div>
+        <label for="toggle-billing" class="relative flex items-center mx-4 cursor-pointer">
+          <input type="checkbox" id="toggle-billing" class="sr-only">
+          <div class="h-6 bg-gray-200 border border-gray-200 rounded-full toggle-bg w-11 dark:bg-gray-700 dark:border-gray-600"></div>
+        </label>
+      </div>
+      <span class="text-base font-medium text-gray-500 dark:text-gray-400">
+        Yearly <span class="text-sm text-green-600 dark:text-green-400">(Save 20%)</span>
+      </span>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <!-- Error State -->
+      <div class="p-8 text-center bg-red-50 border border-red-200 rounded-lg dark:bg-red-900 dark:border-red-800">
+        <p class="text-red-800 dark:text-red-200"><%= error %></p>
+        <a href="/" class="mt-4 inline-flex items-center text-red-600 hover:text-red-800">
+          ← Back to Home
+        </a>
+      </div>
+    <% } else { %>
+      <!-- Pricing Cards -->
+      <section class="grid grid-cols-1 space-y-12 md:space-y-0 md:grid-cols-2 lg:grid-cols-3 md:gap-x-6 md:gap-6 pt-9">
+        <% if (subscriptions && subscriptions.length > 0) { %>
+          <% subscriptions.forEach((subscription, index) => { %>
+            <!-- Pricing Card -->
+            <div class="flex flex-col max-w-lg p-6 mx-auto text-gray-900 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 xl:p-8 dark:bg-gray-800 dark:text-white">
+              <h3 class="mb-4 text-2xl font-semibold"><%= subscription.name %></h3>
+              <% if (subscription.description) { %>
+                <p class="font-light text-gray-500 sm:text-lg dark:text-gray-400"><%= subscription.description %></p>
+              <% } else { %>
+                <p class="font-light text-gray-500 sm:text-lg dark:text-gray-400">Perfect for your business needs.</p>
+              <% } %>
+              
+              <div class="flex items-baseline my-8">
+                <% if (parseFloat(subscription.price) === 0) { %>
+                  <span class="mr-2 text-5xl font-extrabold">Free</span>
+                <% } else { %>
+                  <span class="mr-2 text-5xl font-extrabold price-amount" data-monthly="<%= parseFloat(subscription.price) %>">
+                    Rp <%= new Intl.NumberFormat('id-ID').format(parseFloat(subscription.price)) %>
+                  </span>
+                  <span class="text-gray-500 dark:text-gray-400 billing-period">/month</span>
+                <% } %>
+              </div>
+              
+              <!-- Features List -->
+              <ul role="list" class="mb-8 space-y-4 text-left">
+                <li class="flex items-center space-x-3">
+                  <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span><%= subscription.limit_device > 999 ? 'Unlimited' : subscription.limit_device %> WhatsApp Device<%= subscription.limit_device > 1 ? 's' : '' %></span>
+                </li>
+                <li class="flex items-center space-x-3">
+                  <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span>Access for <%= subscription.duration_days %> days</span>
+                </li>
+                <li class="flex items-center space-x-3">
+                  <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span>Dashboard Analytics</span>
+                </li>
+                <li class="flex items-center space-x-3">
+                  <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span>Smart Message Management</span>
+                </li>
+                <% if (parseFloat(subscription.price) > 0) { %>
+                  <li class="flex items-center space-x-3">
+                    <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Advanced CRM Features</span>
+                  </li>
+                  <li class="flex items-center space-x-3">
+                    <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Anti-Ban Protection</span>
+                  </li>
+                  <% if (parseFloat(subscription.price) > 500000) { %>
+                    <li class="flex items-center space-x-3">
+                      <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                      <span>Premium support: <span class="font-semibold">24/7</span></span>
+                    </li>
+                    <li class="flex items-center space-x-3">
+                      <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                      <span>Custom Integration</span>
+                    </li>
+                  <% } else { %>
+                    <li class="flex items-center space-x-3">
+                      <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                      <span>Premium support: <span class="font-semibold">Email & Chat</span></span>
+                    </li>
+                  <% } %>
+                <% } else { %>
+                  <li class="flex items-center space-x-3">
+                    <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Basic Support</span>
+                  </li>
+                <% } %>
+              </ul>
+              
+              <!-- Usage Stats -->
+              <% if (subscription._count && subscription._count.userSubscriptions > 0) { %>
+                <div class="mb-4 p-2 text-center bg-blue-50 rounded dark:bg-blue-900">
+                  <span class="text-sm text-blue-800 dark:text-blue-200">
+                    <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                    </svg>
+                    <%= subscription._count.userSubscriptions %> active users
+                  </span>
+                </div>
+              <% } %>
+              
+              <% if (typeof user !== 'undefined' && user) { %>
+                <div class="mb-4 p-2 text-center bg-green-50 rounded dark:bg-green-900">
+                  <span class="text-sm text-green-800 dark:text-green-200">
+                    <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                    </svg>
+                    Pemesan: <span class="font-semibold"><%= user.name || user.username || 'User' %></span> &mdash; <%= user.email %>
+                  </span>
+                </div>
+                <form action="/order" method="POST">
+                  <input type="hidden" name="subscription_id" value="<%= subscription.id %>" />
+                  <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:focus:ring-primary-900 subscription-btn">
+                    Pesan Sekarang
+                  </button>
+                </form>
+              <% } else { %>
+                <a href="/registeasr" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:focus:ring-primary-900 subscription-btn" data-subscription-id="<%= subscription.id %>" data-subscription-name="<%= subscription.name %>">
+                  <% if (parseFloat(subscription.price) === 0) { %>
+                    Get started
+                  <% } else { %>
+                    Choose <%= subscription.name %>
+                  <% } %>
+                </a>
+              <% } %>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <!-- Default Fallback Cards -->
+          <!-- Starter Plan -->
+          <div class="flex flex-col max-w-lg p-6 mx-auto text-gray-900 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 xl:p-8 dark:bg-gray-800 dark:text-white">
+            <h3 class="mb-4 text-2xl font-semibold">Starter</h3>
+            <p class="font-light text-gray-500 sm:text-lg dark:text-gray-400">Best option for personal use & for your next project.</p>
+            <div class="flex items-baseline my-8">
+              <span class="mr-2 text-5xl font-extrabold">Free</span>
+            </div>
+            <ul role="list" class="mb-8 space-y-4 text-left">
+              <li class="flex items-center space-x-3">
+                <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span>1 WhatsApp Device</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Basic Support</span>
+              </li>
+              <li class="flex items-center space-x-3">
+                <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Dashboard Analytics</span>
+              </li>
+            </ul>
+            <a href="/register" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:focus:ring-primary-900 subscription-btn" data-subscription-id="free" data-subscription-name="Starter">Get started</a>
+          </div>
+        <% } %>
+      </section>
+    <% } %>
+
+    <!-- Comparison Table -->
+    <% if (subscriptions && subscriptions.length > 1) { %>
+      <section class="flex flex-col pt-10 md:pt-20">
+        <div class="overflow-x-auto rounded-lg">
+          <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow sm:rounded-lg">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-900">
+                  <tr>
+                    <th scope="col" class="p-4 text-left"></th>
+                    <% subscriptions.slice(0, 3).forEach(subscription => { %>
+                      <th scope="col" class="p-4 text-base font-semibold tracking-wider text-right text-gray-900 dark:text-white">
+                        <%= subscription.name %>
+                      </th>
+                    <% }); %>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800">
+                  <tr>
+                    <td class="p-4 text-base font-normal text-gray-500 rounded-l-lg whitespace-nowrap dark:text-gray-400">
+                      WhatsApp Devices
+                    </td>
+                    <% subscriptions.slice(0, 3).forEach(subscription => { %>
+                      <td class="p-4 text-right">
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                          <%= subscription.limit_device > 999 ? 'Unlimited' : subscription.limit_device %>
+                        </span>
+                      </td>
+                    <% }); %>
+                  </tr>
+                  <tr class="bg-gray-50 dark:bg-gray-900">
+                    <td class="p-4 text-base font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                      Access Duration
+                    </td>
+                    <% subscriptions.slice(0, 3).forEach(subscription => { %>
+                      <td class="p-4 text-right">
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                          <%= subscription.duration_days %> days
+                        </span>
+                      </td>
+                    <% }); %>
+                  </tr>
+                  <tr>
+                    <td class="p-4 text-base font-normal text-gray-500 rounded-l-lg whitespace-nowrap dark:text-gray-400">
+                      Advanced CRM
+                    </td>
+                    <% subscriptions.slice(0, 3).forEach(subscription => { %>
+                      <td class="p-4">
+                        <% if (parseFloat(subscription.price) > 0) { %>
+                          <svg class="w-5 h-5 ml-auto text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                          </svg>
+                        <% } else { %>
+                          <svg class="w-5 h-5 ml-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                          </svg>
+                        <% } %>
+                      </td>
+                    <% }); %>
+                  </tr>
+                  <tr class="bg-gray-50 dark:bg-gray-900">
+                    <td class="p-4 text-base font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                      Anti-Ban Protection
+                    </td>
+                    <% subscriptions.slice(0, 3).forEach(subscription => { %>
+                      <td class="p-4">
+                        <% if (parseFloat(subscription.price) > 0) { %>
+                          <svg class="w-5 h-5 ml-auto text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                          </svg>
+                        <% } else { %>
+                          <svg class="w-5 h-5 ml-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                          </svg>
+                        <% } %>
+                      </td>
+                    <% }); %>
+                  </tr>
+                  <tr>
+                    <td class="p-4 text-base font-normal text-gray-500 rounded-l-lg whitespace-nowrap dark:text-gray-400">
+                      24/7 Priority Support
+                    </td>
+                    <% subscriptions.slice(0, 3).forEach(subscription => { %>
+                      <td class="p-4">
+                        <% if (parseFloat(subscription.price) > 500000) { %>
+                          <svg class="w-5 h-5 ml-auto text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                          </svg>
+                        <% } else { %>
+                          <svg class="w-5 h-5 ml-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                          </svg>
+                        <% } %>
+                      </td>
+                    <% }); %>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    <% } %>
+
+    <!-- FAQ Section -->
+    <section class="pt-20">
+      <h2 class="mb-3 text-3xl font-bold text-gray-900 sm:text-4xl sm:leading-none sm:tracking-tight dark:text-white">
+        Frequently asked questions
+      </h2>
+      <p class="mb-6 text-lg font-normal text-gray-500 sm:text-xl dark:text-gray-400">
+        Get answers to common questions about our WhatsApp Business Management platform and subscription plans.
+      </p>
+      <hr class="my-6 border-gray-200 md:my-12 dark:border-gray-800" />
+      
+      <div class="grid gap-8 lg:grid-cols-2">
+        <div>
+          <div class="mb-10">
+            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              Can I upgrade or downgrade my plan anytime?
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              Yes, you can upgrade or downgrade your subscription plan at any time through your dashboard. Changes will be prorated and take effect immediately.
+            </p>
+          </div>
+          <div class="mb-10">
+            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              Is there a free trial available?
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              We offer a free Starter plan that you can use indefinitely with basic features. No credit card required to get started.
+            </p>
+          </div>
+          <div class="mb-10">
+            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              How secure is my WhatsApp data?
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              We implement enterprise-grade security measures including end-to-end encryption, secure data storage, and regular security audits to protect your data.
+            </p>
+          </div>
+        </div>
+        <div>
+          <div class="mb-10">
+            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              What payment methods do you accept?
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              We accept major credit cards, bank transfers, and popular e-wallet services including GoPay, OVO, and DANA.
+            </p>
+          </div>
+          <div class="mb-10">
+            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              Can I cancel my subscription anytime?
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              Yes, you can cancel your subscription at any time. You'll continue to have access to paid features until the end of your current billing period.
+            </p>
+          </div>
+          <div class="mb-10">
+            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              Do you offer refunds?
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              We offer a 30-day money-back guarantee for annual plans. If you're not satisfied, contact us within 30 days for a full refund.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <%- include('./layouts/partials/footer-main.ejs') %>
+  <%- include('./layouts/partials/scripts.ejs') %>
+  
+  <script>
+    // Billing toggle functionality
+    document.getElementById('toggle-billing').addEventListener('change', function() {
+      const isYearly = this.checked;
+      const priceElements = document.querySelectorAll('.price-amount');
+      const billingPeriods = document.querySelectorAll('.billing-period');
+      
+      priceElements.forEach(element => {
+        const monthlyPrice = parseFloat(element.getAttribute('data-monthly'));
+        if (monthlyPrice && monthlyPrice > 0) {
+          if (isYearly) {
+            const yearlyPrice = Math.round(monthlyPrice * 12 * 0.8); // 20% discount
+            element.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(yearlyPrice)}`;
+          } else {
+            element.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(monthlyPrice)}`;
+          }
+        }
+      });
+      
+      billingPeriods.forEach(period => {
+        period.textContent = isYearly ? '/year' : '/month';
+      });
+    });
+
+    // Toggle switch styling
+    const toggleBilling = document.getElementById('toggle-billing');
+    const toggleBg = document.querySelector('.toggle-bg');
+    
+    toggleBilling.addEventListener('change', function() {
+      if (this.checked) {
+        toggleBg.classList.add('bg-primary-600');
+        toggleBg.classList.remove('bg-gray-200');
+      } else {
+        toggleBg.classList.remove('bg-primary-600');
+        toggleBg.classList.add('bg-gray-200');
+      }
+    });
+
+    // Function to get cookie value by name
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    // Handle subscription button clicks
+    // document.addEventListener('DOMContentLoaded', function() {
+    //   const subscriptionButtons = document.querySelectorAll('.subscription-btn');
+      
+    //   subscriptionButtons.forEach(button => {
+    //     button.addEventListener('click', function(e) {
+    //       e.preventDefault();
+          
+    //       const subscriptionId = this.getAttribute('data-subscription-id');
+    //       const subscriptionName = this.getAttribute('data-subscription-name');
+    //       const token = getCookie('token');
+          
+    //       if (token) {
+    //         // User is logged in - redirect to dashboard with subscription info
+    //         localStorage.setItem('selectedSubscription', JSON.stringify({
+    //           id: subscriptionId,
+    //           name: subscriptionName
+    //         }));
+    //         window.location.href = '/dashboard';
+    //       } else {
+    //         // User is not logged in - redirect to register
+    //         localStorage.setItem('selectedSubscription', JSON.stringify({
+    //           id: subscriptionId,
+    //           name: subscriptionName
+    //         }));
+    //         window.location.href = '/register';
+    //       }
+    //     });
+    //   });
+    // });
+  </script>
+</body>
+</html> 

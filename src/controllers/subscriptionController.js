@@ -2,6 +2,9 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Show public subscription plans (for landing page)
+
+
 // Show all subscriptions (main page)
 export const index = async (req, res) => {
   try {

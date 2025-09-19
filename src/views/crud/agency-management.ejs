@@ -1,90 +1,167 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                  <li class="inline-flex items-center">
+                    <a href="/dashboard" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                      <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <div class="flex items-center">
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <a href="#" class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">Management</a>
+                    </div>
+                  </li>
+                  <li>
                 <div class="flex items-center">
-                    <a href="/dashboard" class="text-xl font-bold text-gray-800">Dashboard</a>
-                    <span class="mx-2">/</span>
-                    <h1 class="text-xl font-bold"><%= title %></h1>
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Agency</span>
+                    </div>
+                  </li>
+                </ol>
+            </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Agency Management</h1>
+        </div>
+        <div class="sm:flex">
+            <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0 dark:divide-gray-700">
+                <form class="lg:pr-3" action="#" method="GET">
+                <label for="agencies-search" class="sr-only">Search</label>
+                <div class="relative mt-1 lg:w-64 xl:w-96">
+                    <input type="text" name="search" id="agencies-search" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search for agencies">
                 </div>
-                <div class="flex items-center">
-                    <span class="mr-4">Welcome, <%= user.full_name %></span>
-                    <a href="/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        Logout
+                </form>
+                <div class="flex pl-0 mt-3 space-x-1 sm:pl-2 sm:mt-0">
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                     </a>
                 </div>
             </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            
-            <!-- Header with Create Button -->
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Agency Management</h2>
-                <button onclick="openCreateModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    + Create Agency
+            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                <button type="button" onclick="openCreateModal()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                    Add agency
                 </button>
+                <a href="#" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"></path></svg>
+                    Export
+                </a>
+            </div>
+        </div>
+    </div>
             </div>
 
             <!-- Alert Messages -->
             <div id="alert-container" class="mb-4"></div>
 
-            <!-- Agencies Table -->
-            <div class="bg-white shadow overflow-hidden sm:rounded-md">
+<div class="flex flex-col">
+    <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow">
                 <% if (agencies.length > 0) { %>
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agency</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Domain</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stats</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600">
+                    <thead class="bg-gray-100 dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="p-4">
+                                <div class="flex items-center">
+                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox" class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+                                    <label for="checkbox-all" class="sr-only">checkbox</label>
+                                </div>
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Agency
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Owner
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Domain
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Stats
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Status
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Actions
+                            </th>
                             </tr>
                         </thead>
-                        <tbody id="agencies-table-body" class="bg-white divide-y divide-gray-200">
+                    <tbody id="agencies-table-body" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                             <% agencies.forEach(agency => { %>
-                                <tr id="agency-row-<%= agency.id %>">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900"><%= agency.name %></div>
-                                            <div class="text-sm text-gray-500"><%= agency.company_name || '-' %></div>
+                        <tr id="agency-row-<%= agency.id %>" class="hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <td class="w-4 p-4">
+                                <div class="flex items-center">
+                                    <input id="checkbox-<%= agency.id %>" aria-describedby="checkbox-1" type="checkbox" class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+                                    <label for="checkbox-<%= agency.id %>" class="sr-only">checkbox</label>
+                                </div>
+                            </td>
+                            <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path></svg>
+                                </div>
+                                <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                                    <div class="text-base font-semibold text-gray-900 dark:text-white"><%= agency.name %></div>
+                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400"><%= agency.company_name || '-' %></div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900"><%= agency.owner.full_name %></div>
-                                        <div class="text-sm text-gray-500"><%= agency.owner.email %></div>
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                                    <div class="text-base font-semibold text-gray-900 dark:text-white"><%= agency.owner.full_name %></div>
+                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400"><%= agency.owner.email %></div>
+                                </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         <%= agency.domain || '-' %>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <div>👥 <%= agency._count.users %> users</div>
-                                        <div>💰 <%= agency._count.subscriptions %> subscriptions</div>
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path></svg>
+                                        <%= agency._count.users %> users
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"></path></svg>
+                                        <%= agency._count.subscriptions %> subs
+                                    </span>
+                                </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <%= agency.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
-                                            <%= agency.is_active ? 'Active' : 'Inactive' %>
-                                        </span>
+                            <td class="p-4 text-base font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center">
+                                   <% if (agency.is_active) { %>
+                                        <div class="h-2.5 w-2.5 rounded-full bg-green-400 mr-2"></div>
+                                        Active
+                                    <% } else { %>
+                                        <div class="h-2.5 w-2.5 rounded-full bg-red-500 mr-2"></div>
+                                        Inactive
+                                    <% } %>
+                                </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button onclick="viewAgency('<%= agency.id %>')" class="text-blue-600 hover:text-blue-900 mr-3">View</button>
-                                        <button onclick="editAgency('<%= agency.id %>')" class="text-green-600 hover:text-green-900 mr-3">Edit</button>
-                                        <button onclick="deleteAgency('<%= agency.id %>')" class="text-red-600 hover:text-red-900">Delete</button>
+                            <td class="p-4 space-x-2 whitespace-nowrap">
+                                <button type="button" onclick="viewAgency('<%= agency.id %>')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg>
+                                    View
+                                </button>
+                                <button type="button" onclick="editAgency('<%= agency.id %>')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
+                                    Edit
+                                </button>
+                                <button type="button" onclick="deleteAgency('<%= agency.id %>')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                    Delete
+                                </button>
                                     </td>
                                 </tr>
                             <% }); %>
@@ -92,30 +169,62 @@
                     </table>
                 <% } else { %>
                     <div class="text-center py-12">
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">No agencies yet</h3>
-                        <p class="text-gray-500">Start by creating your first agency.</p>
-                        <button onclick="openCreateModal()" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Create Agency
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No agencies</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new agency.</p>
+                    <div class="mt-6">
+                        <button type="button" onclick="openCreateModal()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-500">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                            Add agency
                         </button>
+                    </div>
                     </div>
                 <% } %>
             </div>
-
         </div>
-    </main>
+    </div>
+</div>
 
     <!-- Create/Edit Modal -->
-    <div id="agency-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-bold text-gray-900 mb-4" id="modal-title">Create Agency</h3>
-                <form id="agency-form">
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="agency-modal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="modal-title">Create Agency</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Add or modify agency information</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="px-6 py-6">
+                <form id="agency-form" class="space-y-6">
                     <input type="hidden" id="agency-id" name="agency_id">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Owner</label>
-                            <select id="owner_id" name="owner_id" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                            <label for="owner_id" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path></svg>
+                                Owner *
+                            </label>
+                            <select id="owner_id" name="owner_id" required class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                 <option value="">Select Owner</option>
                                 <% users.forEach(user => { %>
                                     <option value="<%= user.id %>"><%= user.full_name %> (<%= user.email %>)</option>
@@ -124,75 +233,205 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Agency Name</label>
-                            <input type="text" id="name" name="name" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                            <label for="name" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                Agency Name *
+                            </label>
+                            <input type="text" id="name" name="name" required class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter agency name">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Slug</label>
-                            <input type="text" id="slug" name="slug" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                            <label for="slug" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"></path></svg>
+                                Slug *
+                            </label>
+                            <input type="text" id="slug" name="slug" required class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter slug">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Domain</label>
-                            <input type="text" id="domain" name="domain" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <label for="domain" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd"></path></svg>
+                                Domain
+                            </label>
+                            <input type="text" id="domain" name="domain" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter domain">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-                            <input type="text" id="company_name" name="company_name" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <label for="company_name" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-6a1 1 0 00-1-1H9a1 1 0 00-1 1v6a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H8a1 1 0 01-1-1v-4zM7 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1V5z" clip-rule="evenodd"></path></svg>
+                                Company Name
+                            </label>
+                            <input type="text" id="company_name" name="company_name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter company name">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tagline</label>
-                            <input type="text" id="tagline" name="tagline" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <label for="tagline" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"></path></svg>
+                                Tagline
+                            </label>
+                            <input type="text" id="tagline" name="tagline" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter tagline">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
-                            <input type="url" id="logo_url" name="logo_url" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <label for="logo_url" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg>
+                                Logo URL
+                            </label>
+                            <input type="url" id="logo_url" name="logo_url" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter logo URL">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Favicon URL</label>
-                            <input type="url" id="favicon_url" name="favicon_url" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <label for="favicon_url" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg>
+                                Favicon URL
+                            </label>
+                            <input type="url" id="favicon_url" name="favicon_url" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter favicon URL">
                         </div>
                         
                         <div class="md:col-span-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" id="is_active" name="is_active" class="mr-2" checked>
-                                <span class="text-sm font-medium text-gray-700">Active</span>
-                            </label>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="is_active" name="is_active" checked class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="is_active" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    Active
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="flex justify-end mt-6 space-x-3">
-                        <button type="button" onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                            Cancel
-                        </button>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Save
-                        </button>
                     </div>
                 </form>
             </div>
-        </div>
-    </div>
-
-    <!-- View Modal -->
-    <div id="view-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Agency Details</h3>
-                <div id="agency-details"></div>
-                <div class="flex justify-end mt-6">
-                    <button onclick="closeViewModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        Close
-                    </button>
-                </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="closeModal()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    Cancel
+                </button>
+                <button type="submit" form="agency-form" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:ring-4 focus:ring-blue-300 rounded-lg shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:focus:ring-blue-800">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                    Save Agency
+                </button>
             </div>
         </div>
     </div>
+</div>
+
+    <!-- View Modal -->
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="view-modal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeViewModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Agency Details</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">View complete agency information</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeViewModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="px-6 py-6">
+                <div id="agency-details" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Agency details will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-center px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="closeViewModal()" class="inline-flex items-center px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <style>
+        /* Gradient backgrounds for buttons */
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops));
+        }
+        .from-blue-500 {
+            --tw-gradient-from: #3b82f6;
+            --tw-gradient-to: rgb(59 130 246 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-indigo-600 {
+            --tw-gradient-to: #4f46e5;
+        }
+        .hover\:from-blue-600:hover {
+            --tw-gradient-from: #2563eb;
+        }
+        .hover\:to-indigo-700:hover {
+            --tw-gradient-to: #4338ca;
+        }
+        .from-green-500 {
+            --tw-gradient-from: #22c55e;
+            --tw-gradient-to: rgb(34 197 94 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-emerald-600 {
+            --tw-gradient-to: #059669;
+        }
+        
+        /* Backdrop blur effect */
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Transform scale effect */
+        .hover\:scale-105:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Enhanced shadows */
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Gradient header backgrounds */
+        .from-blue-50 {
+            --tw-gradient-from: #eff6ff;
+            --tw-gradient-to: rgb(239 246 255 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-indigo-50 {
+            --tw-gradient-to: #eef2ff;
+        }
+        .from-green-50 {
+            --tw-gradient-from: #f0fdf4;
+            --tw-gradient-to: rgb(240 253 244 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-emerald-50 {
+            --tw-gradient-to: #ecfdf5;
+        }
+        .dark .dark\:from-gray-700 {
+            --tw-gradient-from: #374151;
+            --tw-gradient-to: rgb(55 65 81 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .dark .dark\:to-gray-800 {
+            --tw-gradient-to: #1f2937;
+        }
+    </style>
 
     <script>
         let isEdit = false;
@@ -242,16 +481,79 @@
                     if (data.agency) {
                         const agency = data.agency;
                         document.getElementById('agency-details').innerHTML = `
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><strong>Name:</strong> ${agency.name}</div>
-                                <div><strong>Company:</strong> ${agency.company_name || '-'}</div>
-                                <div><strong>Owner:</strong> ${agency.owner.full_name}</div>
-                                <div><strong>Domain:</strong> ${agency.domain || '-'}</div>
-                                <div><strong>Slug:</strong> ${agency.slug}</div>
-                                <div><strong>Status:</strong> ${agency.is_active ? 'Active' : 'Inactive'}</div>
-                                <div class="md:col-span-2"><strong>Tagline:</strong> ${agency.tagline || '-'}</div>
-                                <div><strong>Users:</strong> ${agency.users.length}</div>
-                                <div><strong>Subscriptions:</strong> ${agency.subscriptions.length}</div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Basic Information</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Name:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.name}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Company:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.company_name || '-'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Slug:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.slug}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Domain:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.domain || '-'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Status:</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${agency.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}">
+                                            ${agency.is_active ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Owner Information</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Name:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.owner.full_name}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Email:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.owner.email}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Statistics</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Users:</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            ${agency.users.length} users
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Subscriptions:</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                            ${agency.subscriptions.length} subscriptions
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg md:col-span-2">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Additional Information</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Tagline:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.tagline || '-'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Logo URL:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.logo_url || '-'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Favicon URL:</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">${agency.favicon_url || '-'}</span>
+                                    </div>
+                                </div>
                             </div>
                         `;
                         document.getElementById('view-modal').classList.remove('hidden');
@@ -292,18 +594,48 @@
             document.getElementById('view-modal').classList.add('hidden');
         }
 
-        function showAlert(message, type) {
+        function showAlert(message, type = 'info') {
             const alertContainer = document.getElementById('alert-container');
-            const alertClass = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
-            
-            alertContainer.innerHTML = `
-                <div class="${alertClass} border px-4 py-3 rounded mb-4">
+            if (!alertContainer) return;
+
+            const alertTypes = {
+                success: 'bg-green-100 border-green-500 text-green-700 dark:bg-green-900 dark:border-green-600 dark:text-green-300',
+                error: 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900 dark:border-red-600 dark:text-red-300',
+                warning: 'bg-yellow-100 border-yellow-500 text-yellow-700 dark:bg-yellow-900 dark:border-yellow-600 dark:text-yellow-300',
+                info: 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900 dark:border-blue-600 dark:text-blue-300'
+            };
+
+            const iconTypes = {
+                success: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+                error: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+                warning: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+                info: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>'
+            };
+
+            const alertId = 'alert-' + Date.now();
+            const alertElement = document.createElement('div');
+            alertElement.id = alertId;
+            alertElement.className = `flex items-center p-4 mb-4 border rounded-lg ${alertTypes[type] || alertTypes.info}`;
+            alertElement.innerHTML = `
+                <div class="flex-shrink-0">
+                    ${iconTypes[type] || iconTypes.info}
+                </div>
+                <div class="ml-3 text-sm font-medium">
                     ${message}
                 </div>
+                <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:hover:bg-gray-700" onclick="document.getElementById('${alertId}').remove()">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             `;
             
+            alertContainer.appendChild(alertElement);
+
+            // Auto-remove after 5 seconds
             setTimeout(() => {
-                alertContainer.innerHTML = '';
+                if (document.getElementById(alertId)) {
+                    document.getElementById(alertId).remove();
+                }
             }, 5000);
         }
 
@@ -344,5 +676,28 @@
             });
         });
     </script>
+    
+    <style>
+        .bg-primary-50 { background-color: #eff6ff; }
+        .bg-primary-100 { background-color: #dbeafe; }
+        .bg-primary-500 { background-color: #3b82f6; }
+        .bg-primary-600 { background-color: #2563eb; }
+        .bg-primary-700 { background-color: #1d4ed8; }
+        .bg-primary-800 { background-color: #1e40af; }
+        .text-primary-600 { color: #2563eb; }
+        .text-primary-700 { color: #1d4ed8; }
+        .border-primary-300 { border-color: #93c5fd; }
+        .border-primary-500 { border-color: #3b82f6; }
+        .focus\:ring-primary-300:focus { box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5); }
+        .focus\:ring-primary-500:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); }
+        .focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+        .focus\:border-primary-500:focus { border-color: #3b82f6; }
+        .hover\:bg-primary-800:hover { background-color: #1e40af; }
+        .hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .dark .dark\:bg-primary-600 { background-color: #2563eb; }
+        .dark .dark\:hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .dark .dark\:focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+        .dark .dark\:focus\:ring-primary-600:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5); }
+    </style>
 </body>
 </html> 

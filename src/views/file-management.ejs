@@ -1,315 +1,510 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        .upload-zone {
-            border: 2px dashed #e5e7eb;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #f9fafb;
-        }
-        .upload-zone:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-        .upload-zone.dragover {
-            border-color: #10b981;
-            background: #d1fae5;
-        }
-        .file-card {
-            transition: all 0.2s ease;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: white;
-        }
-        .file-card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-color: #3b82f6;
-        }
-        .file-preview {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid #e5e7eb;
-        }
-        .file-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-        }
-        .progress-container {
-            display: none;
-            margin-top: 15px;
-        }
-        .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
-        }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-        }
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    </style>
-</head>
-<body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                  <li class="inline-flex items-center">
+                    <a href="/dashboard" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                      <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <div class="flex items-center">
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <a href="#" class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">Files</a>
+                    </div>
+                  </li>
+                  <li>
                 <div class="flex items-center">
-                    <a href="/dashboard" class="text-xl font-bold text-gray-800">Dashboard</a>
-                    <span class="mx-2">/</span>
-                    <h1 class="text-xl font-bold"><%= title %></h1>
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                      <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Management</span>
+                    </div>
+                  </li>
+                </ol>
+            </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">All files</h1>
+        </div>
+        <div class="sm:flex">
+            <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0 dark:divide-gray-700">
+                <form class="lg:pr-3" action="#" method="GET">
+                <label for="files-search" class="sr-only">Search</label>
+                <div class="relative mt-1 lg:w-64 xl:w-96">
+                    <input type="text" name="search" id="files-search" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search for files">
                 </div>
-                <div class="flex items-center">
-                    <span class="mr-4">Welcome, <%= user.full_name %></span>
-                    <a href="/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        Logout
+                </form>
+                <div class="flex pl-0 mt-3 space-x-1 sm:pl-2 sm:mt-0">
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                     </a>
                 </div>
             </div>
+            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                <button type="button" onclick="openUploadModal()" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                    Upload files
+                </button>
+                <a href="#" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"></path></svg>
+                    Export
+                </a>
+            </div>
         </div>
-    </nav>
+    </div>
+</div>
 
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold">File Management</h2>
-                    <p class="text-gray-600">Upload, manage, and send files via WhatsApp</p>
+<!-- Alert Messages -->
+<div id="alert-container" class="mb-4"></div>
+
+<div class="flex flex-col">
+    <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600" id="files-table" style="display: none;">
+                    <thead class="bg-gray-100 dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="p-4">
+                                <div class="flex items-center">
+                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox" class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+                                    <label for="checkbox-all" class="sr-only">checkbox</label>
                 </div>
-                <div class="flex space-x-3">
-                    <button onclick="loadUserFiles()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="bi bi-arrow-clockwise"></i> Refresh
-                    </button>
-                    <button onclick="loadUserStats()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="bi bi-bar-chart"></i> View Stats
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                File
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Type
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Size
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Usage
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Created
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="files-table-body" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                        <!-- Files will be populated here -->
+                    </tbody>
+                </table>
+                <div id="no-files-message" class="text-center py-12">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No files yet</h3>
+                    <p class="text-gray-500">Start by uploading your first file.</p>
+                    <button onclick="openUploadModal()" class="mt-4 bg-primary-700 hover:bg-primary-800 text-white font-bold py-2 px-4 rounded">
+                        + Upload File
                     </button>
                 </div>
             </div>
-
-            <!-- Stats Panel -->
-            <div class="bg-white rounded-lg shadow p-6 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-blue-600" id="totalFiles">0</div>
-                        <div class="text-gray-600">Total Files</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-green-600" id="totalSize">0 MB</div>
-                        <div class="text-gray-600">Total Size</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-purple-600" id="userInfo"><%= user.full_name %></div>
-                        <div class="text-gray-600">User ID: <%= user.id %></div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Upload Section -->
-                <div class="bg-white rounded-lg shadow">
-                    <div class="p-6 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold">
-                            <i class="bi bi-cloud-upload text-blue-600"></i> Upload Files
-                        </h3>
-                    </div>
-                    <div class="p-6">
-                        <!-- Upload Zone -->
-                        <div class="upload-zone" id="uploadZone">
-                            <i class="bi bi-cloud-upload text-4xl text-gray-400 mb-3"></i>
-                            <h5 class="text-lg font-medium">Drag files here or click to browse</h5>
-                            <p class="text-gray-500 mb-3">Supports images, videos, documents, and audio files</p>
-                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                <i class="bi bi-folder"></i> Choose Files
-                            </button>
-                            <input type="file" id="fileInput" class="hidden" multiple 
-                                   accept="image/*,video/*,.pdf,.doc,.docx,.txt,.mp3,.wav,.ogg">
+<!-- Pagination -->
+<div class="sticky bottom-0 right-0 items-center w-full p-4 bg-white border-t border-gray-200 sm:flex sm:justify-between dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex items-center mb-4 sm:mb-0">
+        <a href="#" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+        </a>
+        <a href="#" class="inline-flex justify-center p-1 mr-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        </a>
+        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Showing <span class="font-semibold text-gray-900 dark:text-white" id="files-count">0</span> files</span>
+    </div>
+    <div class="flex items-center space-x-3">
+        <a href="#" class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            <svg class="w-5 h-5 mr-1 -ml-1"" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            Previous
+        </a>
+        <a href="#" class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            Next
+            <svg class="w-5 h-5 ml-1 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        </a>
+    </div>
+</div>
+
+<!-- Upload File Modal -->
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="upload-modal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeUploadModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
                         </div>
-
-                        <!-- Upload Form -->
-                        <div class="mt-4">
-                            <label for="fileDescription" class="block text-sm font-medium text-gray-700 mb-2">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Upload Files</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Upload new files to the system</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeUploadModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="px-6 py-6">
+                <form id="upload-form">
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6">
+                            <label class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                Files *
+                            </label>
+                            <div class="upload-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 dark:border-gray-600 dark:hover:border-indigo-500 dark:hover:bg-gray-700 transition-all duration-200" id="uploadZone">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                                        <label for="fileInput" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                            <span class="font-semibold">Click to upload files</span>
+                                            <input id="fileInput" name="files" type="file" class="sr-only" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt,.mp3,.wav,.ogg">
+                                        </label>
+                                        <p class="mt-1">or drag and drop files here</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Images, videos, documents up to 10MB</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-6 sm:col-span-3">
+                            <label for="fileDescription" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
                                 Description (Optional)
                             </label>
-                            <input type="text" id="fileDescription" 
-                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="Enter file description...">
+                            <input type="text" name="description" id="fileDescription" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="File description">
                         </div>
-
-                        <!-- Expires In Field -->
-                        <div class="mt-4">
-                            <label for="expiresIn" class="block text-sm font-medium text-gray-700 mb-2">
-                                Expires In (Optional)
+                        <div class="col-span-6 sm:col-span-3">
+                            <label for="expiresIn" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                Expires In
                             </label>
-                            <select id="expiresIn" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <select id="expiresIn" name="expiresIn" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500">
                                 <option value="">Never expires</option>
                                 <option value="24">24 hours</option>
                                 <option value="168">1 week</option>
                                 <option value="720">1 month</option>
                             </select>
                         </div>
-
-                        <!-- Progress Bar -->
-                        <div class="progress-container mt-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm text-gray-600">Uploading...</span>
-                                <span class="text-sm text-gray-600" id="uploadPercent">0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                                     id="uploadProgress" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Upload Button -->
-                        <button id="uploadBtn" disabled
-                                class="w-full mt-4 bg-green-500 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded">
-                            <i class="bi bi-upload"></i> Upload Selected Files
-                        </button>
-                    </div>
-                </div>
-
-                <!-- File List -->
-                <div class="bg-white rounded-lg shadow">
-                    <div class="p-6 border-b border-gray-200">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-semibold">
-                                <i class="bi bi-files text-blue-600"></i> My Files
-                            </h3>
-                            <div class="flex space-x-2">
-                                <select id="fileTypeFilter" class="border border-gray-300 rounded-md px-3 py-1 text-sm">
-                                    <option value="">All Types</option>
-                                    <option value="image">Images</option>
-                                    <option value="video">Videos</option>
-                                    <option value="document">Documents</option>
-                                    <option value="audio">Audio</option>
-                                </select>
-                                <select id="sortBy" class="border border-gray-300 rounded-md px-3 py-1 text-sm">
-                                    <option value="createdAt">Newest First</option>
-                                    <option value="size">Size</option>
-                                    <option value="name">Name</option>
-                                </select>
-                            </div>
+                        <div class="col-span-6">
+                            <div id="selectedFilesList" class="hidden space-y-2"></div>
                         </div>
                     </div>
-                    <div class="p-6 max-h-96 overflow-y-auto">
-                        <div id="filesList">
-                            <div class="text-center py-8 text-gray-500">
-                                <i class="bi bi-files text-4xl mb-3"></i>
-                                <p>No files uploaded yet</p>
-                                <small>Upload some files to see them here</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
-
-            <!-- Bulk Actions -->
-            <div id="bulkActionsCard" class="bg-white rounded-lg shadow mt-6" style="display: none;">
-                <div class="p-6">
-                    <h4 class="text-lg font-semibold mb-4">
-                        <i class="bi bi-check-square text-blue-600"></i> Bulk Actions
-                    </h4>
-                    <div class="flex space-x-3">
-                        <button id="bulkDeleteBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                            <i class="bi bi-trash"></i> Delete Selected (<span id="selectedCount">0</span>)
-                        </button>
-                        <button id="selectAllBtn" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                            <i class="bi bi-check-all"></i> Select All
-                        </button>
-                        <button id="clearSelectionBtn" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                            <i class="bi bi-square"></i> Clear Selection
-                        </button>
-                    </div>
-                </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="closeUploadModal()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    Cancel
+                </button>
+                <button type="button" onclick="uploadFiles()" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 rounded-lg shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:focus:ring-indigo-800">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Upload Files
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Send File Modal -->
-    <div id="sendFileModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">
-                    <i class="bi bi-whatsapp text-green-600"></i> Send File via WhatsApp
-                </h3>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">File</label>
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="send-modal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeSendModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <div id="sendFilePreview" class="mr-3"></div>
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                        </div>
                         <div>
-                            <div class="font-bold" id="sendFileName">filename.jpg</div>
-                            <small class="text-gray-500" id="sendFileInfo">Type • Size</small>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Send File via WhatsApp</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Send file directly to a contact</p>
                         </div>
                     </div>
-                </div>
-                <div class="mb-4">
-                    <label for="sendToNumber" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                    <input type="text" id="sendToNumber" 
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="628123456789" required>
-                    <small class="text-gray-500">Enter phone number with country code (e.g., 628123456789)</small>
-                </div>
-                <div class="mb-4">
-                    <label for="sendCaption" class="block text-sm font-medium text-gray-700 mb-2">Caption (Optional)</label>
-                    <textarea id="sendCaption" rows="3" 
-                              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                              placeholder="Enter a caption for your file..."></textarea>
-                </div>
-                <div class="flex justify-end space-x-3">
-                    <button onclick="closeSendModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        Cancel
-                    </button>
-                    <button onclick="sendFile()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="bi bi-send"></i> Send File
+                    <button type="button" onclick="closeSendModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </button>
                 </div>
             </div>
+            
+            <!-- Modal body -->
+            <div class="px-6 py-6">
+                <form id="send-form">
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6">
+                            <label class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path></svg>
+                                File
+                            </label>
+                            <div class="flex items-center p-4 bg-gray-50 rounded-lg dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                                <div id="sendFilePreview" class="mr-3"></div>
+                                <div>
+                                    <div class="font-semibold text-gray-900 dark:text-white" id="sendFileName">filename.jpg</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400" id="sendFileInfo">Type • Size</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-6">
+                            <label for="sendToNumber" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                                Phone Number *
+                            </label>
+                            <input type="text" name="phoneNumber" id="sendToNumber" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="628123456789" required>
+                            <p class="text-xs text-gray-500 mt-2">Enter phone number with country code (e.g., 628123456789)</p>
+                        </div>
+                        <div class="col-span-6">
+                            <label for="sendCaption" class="block mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                                Caption (Optional)
+                            </label>
+                            <textarea name="caption" id="sendCaption" rows="3" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="Enter a caption for your file..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="closeSendModal()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    Cancel
+                </button>
+                <button type="button" onclick="sendFile()" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:ring-4 focus:ring-green-300 rounded-lg shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:focus:ring-green-800">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                    Send File
+                </button>
+            </div>
         </div>
     </div>
+</div>
+
+<!-- Delete File Modal -->
+<div class="fixed inset-0 z-50 hidden overflow-y-auto" id="deleteFileModal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeDeleteFileModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <!-- Modal header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-red-50 to-pink-50 dark:from-gray-700 dark:to-gray-800">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-red-500 to-pink-600 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Delete File</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="px-6 py-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white">Are you sure?</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            This file will be permanently deleted and cannot be recovered. Any links to this file will stop working.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                <button type="button" onclick="closeDeleteFileModal()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    Cancel
+                </button>
+                <button type="button" onclick="confirmDeleteFile()" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 focus:ring-4 focus:ring-red-300 rounded-lg shadow-lg transform transition duration-150 ease-in-out hover:scale-105 dark:focus:ring-red-800">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    Delete File
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <style>
+        /* Gradient backgrounds for buttons */
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops));
+        }
+        .from-indigo-500 {
+            --tw-gradient-from: #6366f1;
+            --tw-gradient-to: rgb(99 102 241 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-purple-600 {
+            --tw-gradient-to: #9333ea;
+        }
+        .hover\:from-indigo-600:hover {
+            --tw-gradient-from: #4f46e5;
+        }
+        .hover\:to-purple-700:hover {
+            --tw-gradient-to: #7c3aed;
+        }
+        .from-green-500 {
+            --tw-gradient-from: #22c55e;
+            --tw-gradient-to: rgb(34 197 94 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-emerald-600 {
+            --tw-gradient-to: #059669;
+        }
+        .hover\:from-green-600:hover {
+            --tw-gradient-from: #16a34a;
+        }
+        .hover\:to-emerald-700:hover {
+            --tw-gradient-to: #047857;
+        }
+        
+        /* Backdrop blur effect */
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Transform scale effect */
+        .hover\:scale-105:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Enhanced shadows */
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Gradient header backgrounds */
+        .from-indigo-50 {
+            --tw-gradient-from: #eef2ff;
+            --tw-gradient-to: rgb(238 242 255 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-purple-50 {
+            --tw-gradient-to: #faf5ff;
+        }
+        .from-green-50 {
+            --tw-gradient-from: #f0fdf4;
+            --tw-gradient-to: rgb(240 253 244 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-emerald-50 {
+            --tw-gradient-to: #ecfdf5;
+        }
+        .from-red-50 {
+            --tw-gradient-from: #fef2f2;
+            --tw-gradient-to: rgb(254 242 242 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-pink-50 {
+            --tw-gradient-to: #fdf2f8;
+        }
+        .from-red-500 {
+            --tw-gradient-from: #ef4444;
+            --tw-gradient-to: rgb(239 68 68 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .to-pink-600 {
+            --tw-gradient-to: #db2777;
+        }
+        .hover\:from-red-600:hover {
+            --tw-gradient-from: #dc2626;
+        }
+        .hover\:to-pink-700:hover {
+            --tw-gradient-to: #be185d;
+        }
+        .dark .dark\:from-gray-700 {
+            --tw-gradient-from: #374151;
+            --tw-gradient-to: rgb(55 65 81 / 0);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        }
+        .dark .dark\:to-gray-800 {
+            --tw-gradient-to: #1f2937;
+        }
+
+        .bg-primary-50 { background-color: #eff6ff; }
+        .bg-primary-100 { background-color: #dbeafe; }
+        .bg-primary-500 { background-color: #3b82f6; }
+        .bg-primary-600 { background-color: #2563eb; }
+        .bg-primary-700 { background-color: #1d4ed8; }
+        .bg-primary-800 { background-color: #1e40af; }
+        .text-primary-600 { color: #2563eb; }
+        .text-primary-700 { color: #1d4ed8; }
+        .border-primary-300 { border-color: #93c5fd; }
+        .border-primary-500 { border-color: #3b82f6; }
+        .focus\:ring-primary-300:focus { box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5); }
+        .focus\:ring-primary-500:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); }
+        .focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+        .focus\:border-primary-500:focus { border-color: #3b82f6; }
+        .hover\:bg-primary-800:hover { background-color: #1e40af; }
+        .hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .dark .dark\:bg-primary-600 { background-color: #2563eb; }
+        .dark .dark\:hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .dark .dark\:focus\:ring-primary-800:focus { box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.5); }
+        .dark .dark\:focus\:ring-primary-600:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5); }
+        
+        .upload-zone:hover { border-color: #2563eb; background-color: #eff6ff; }
+        .upload-zone.dragover { border-color: #059669; background-color: #d1fae5; }
+    </style>
 
     <script>
         // Global variables
         let selectedFiles = [];
         let allFiles = [];
-        let selectedFileIds = [];
         let currentFileToSend = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
             loadUserFiles();
-            loadUserStats();
         });
 
         function setupEventListeners() {
@@ -317,27 +512,26 @@
             const uploadZone = document.getElementById('uploadZone');
             const fileInput = document.getElementById('fileInput');
 
+            if (uploadZone && fileInput) {
             uploadZone.addEventListener('click', () => fileInput.click());
             uploadZone.addEventListener('dragover', handleDragOver);
             uploadZone.addEventListener('drop', handleDrop);
             uploadZone.addEventListener('dragleave', handleDragLeave);
-
             fileInput.addEventListener('change', handleFileSelect);
+            }
+        }
 
-            // Button events
-            document.getElementById('uploadBtn').addEventListener('click', uploadFiles);
+        // Modal functions
+        function openUploadModal() {
+            document.getElementById('upload-modal').classList.remove('hidden');
+        }
 
-            // Bulk actions
-            document.getElementById('bulkDeleteBtn').addEventListener('click', bulkDeleteFiles);
-            document.getElementById('selectAllBtn').addEventListener('click', selectAllFiles);
-            document.getElementById('clearSelectionBtn').addEventListener('click', clearSelection);
-
-            // Filters
-            document.getElementById('fileTypeFilter').addEventListener('change', filterFiles);
-            document.getElementById('sortBy').addEventListener('change', filterFiles);
-
-            // File list events (delegated)
-            document.getElementById('filesList').addEventListener('click', handleFileListClick);
+        function closeUploadModal() {
+            document.getElementById('upload-modal').classList.add('hidden');
+            selectedFiles = [];
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileDescription').value = '';
+            document.getElementById('expiresIn').value = '';
         }
 
         // Drag and drop handlers
@@ -351,7 +545,6 @@
             e.preventDefault();
             e.stopPropagation();
             document.getElementById('uploadZone').classList.remove('dragover');
-
             const files = Array.from(e.dataTransfer.files);
             handleFileSelect({ target: { files } });
         }
@@ -365,49 +558,38 @@
         // File selection handler
         function handleFileSelect(e) {
             selectedFiles = Array.from(e.target.files);
-            updateUploadButton();
-            showSelectedFiles();
+            showSelectedFilesList();
         }
 
-        function updateUploadButton() {
-            const uploadBtn = document.getElementById('uploadBtn');
-
-            if (selectedFiles.length > 0) {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = `<i class="bi bi-upload"></i> Upload ${selectedFiles.length} File(s)`;
-            } else {
-                uploadBtn.disabled = true;
-                uploadBtn.innerHTML = '<i class="bi bi-upload"></i> Upload Selected Files';
+        function showSelectedFilesList() {
+            const container = document.getElementById('selectedFilesList');
+            if (selectedFiles.length === 0) {
+                container.classList.add('hidden');
+                return;
             }
-        }
 
-        function showSelectedFiles() {
-            if (selectedFiles.length === 0) return;
-
-            const container = document.getElementById('uploadZone');
-            container.innerHTML = `
-                <i class="bi bi-files text-4xl text-green-600 mb-3"></i>
-                <h5 class="text-lg font-medium">${selectedFiles.length} file(s) selected</h5>
-                <p class="text-gray-500 mb-3">${selectedFiles.map(f => f.name).join(', ')}</p>
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="bi bi-plus"></i> Add More Files
-                </button>
-            `;
+            container.classList.remove('hidden');
+            container.innerHTML = selectedFiles.map(file => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span class="text-sm">${file.name}</span>
+                    <span class="text-xs text-gray-500">${formatFileSize(file.size)}</span>
+                </div>
+            `).join('');
         }
 
         // Upload files
         async function uploadFiles() {
-            if (selectedFiles.length === 0) return;
+            if (selectedFiles.length === 0) {
+                showAlert('Please select files to upload', 'error');
+                return;
+            }
 
             const description = document.getElementById('fileDescription').value;
             const expiresIn = document.getElementById('expiresIn').value;
-            showProgress();
 
             try {
-                for (let i = 0; i < selectedFiles.length; i++) {
-                    const file = selectedFiles[i];
+                for (const file of selectedFiles) {
                     const formData = new FormData();
-
                     formData.append('file', file);
                     if (description) formData.append('description', description);
                     if (expiresIn) formData.append('expiresIn', expiresIn);
@@ -420,79 +602,24 @@
                     if (!response.ok) {
                         throw new Error(`Upload failed: ${response.statusText}`);
                     }
-
-                    const result = await response.json();
-                    console.log('File uploaded:', result);
-
-                    // Update progress
-                    const percent = Math.round(((i + 1) / selectedFiles.length) * 100);
-                    updateProgress(percent);
                 }
 
-                showNotification('Files uploaded successfully!', 'success');
-                resetUploadForm();
+                showAlert('Files uploaded successfully!', 'success');
+                closeUploadModal();
                 loadUserFiles();
-                loadUserStats();
             } catch (error) {
                 console.error('Upload error:', error);
-                showNotification('Upload failed: ' + error.message, 'error');
-            } finally {
-                hideProgress();
+                showAlert('Upload failed: ' + error.message, 'error');
             }
-        }
-
-        // Progress functions
-        function showProgress() {
-            document.getElementById('uploadBtn').disabled = true;
-            document.querySelector('.progress-container').style.display = 'block';
-        }
-
-        function updateProgress(percent) {
-            document.getElementById('uploadProgress').style.width = percent + '%';
-            document.getElementById('uploadPercent').textContent = percent + '%';
-        }
-
-        function hideProgress() {
-            document.querySelector('.progress-container').style.display = 'none';
-            document.getElementById('uploadBtn').disabled = false;
-        }
-
-        function resetUploadForm() {
-            selectedFiles = [];
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileDescription').value = '';
-            document.getElementById('expiresIn').value = '';
-
-            // Reset upload zone
-            document.getElementById('uploadZone').innerHTML = `
-                <i class="bi bi-cloud-upload text-4xl text-gray-400 mb-3"></i>
-                <h5 class="text-lg font-medium">Drag files here or click to browse</h5>
-                <p class="text-gray-500 mb-3">Supports images, videos, documents, and audio files</p>
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="bi bi-folder"></i> Choose Files
-                </button>
-                <input type="file" id="fileInput" class="hidden" multiple 
-                       accept="image/*,video/*,.pdf,.doc,.docx,.txt,.mp3,.wav,.ogg">
-            `;
-
-            // Re-attach event listener
-            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
-            updateUploadButton();
         }
 
         // Load user files
         async function loadUserFiles() {
             try {
                 const response = await fetch('/api/whatsapp/files?sortBy=createdAt&sortOrder=DESC&limit=100');
-
-                if (!response.ok) {
-                    throw new Error(`Failed to load files: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Failed to load files: ${response.statusText}`);
 
                 const data = await response.json();
-                console.log('API Response:', data); // Debug log
-                
-                // Handle different response structures
                 let files = [];
                 if (data.data && Array.isArray(data.data)) {
                     files = data.data;
@@ -500,127 +627,124 @@
                     files = data.files;
                 } else if (Array.isArray(data)) {
                     files = data;
-                } else {
-                    console.warn('Unexpected API response structure:', data);
-                    files = [];
                 }
                 
                 allFiles = files;
-                console.log('Processed files:', allFiles); // Debug log
-
                 renderFilesList(allFiles);
             } catch (error) {
                 console.error('Error loading files:', error);
-                showNotification('Failed to load files: ' + error.message, 'error');
-            }
-        }
-
-        // Load user stats
-        async function loadUserStats() {
-            try {
-                const response = await fetch('/api/whatsapp/files/stats');
-
-                if (!response.ok) throw new Error('Failed to load stats');
-
-                const data = await response.json();
-                console.log('Stats Response:', data); // Debug log
-                
-                // Handle different response structures
-                let stats = {};
-                if (data.data) {
-                    stats = data.data;
-                } else if (data.stats) {
-                    stats = data.stats;
-                } else {
-                    stats = data;
-                }
-
-                document.getElementById('totalFiles').textContent = stats.totalFiles || 0;
-                document.getElementById('totalSize').textContent = formatFileSize(stats.totalSize || 0);
-            } catch (error) {
-                console.error('Error loading stats:', error);
-                // Set default values on error
-                document.getElementById('totalFiles').textContent = '0';
-                document.getElementById('totalSize').textContent = '0 B';
+                showAlert('Failed to load files: ' + error.message, 'error');
             }
         }
 
         // Render files list
         function renderFilesList(files) {
-            const container = document.getElementById('filesList');
-            
-            // Validate files is an array
-            if (!Array.isArray(files)) {
-                console.error('Files is not an array:', files);
-                files = [];
-            }
+            const tableBody = document.getElementById('files-table-body');
+            const filesTable = document.getElementById('files-table');
+            const noFilesMessage = document.getElementById('no-files-message');
+            const filesCount = document.getElementById('files-count');
+
+            if (!Array.isArray(files)) files = [];
 
             if (files.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="bi bi-files text-4xl mb-3"></i>
-                        <p>No files found</p>
-                        <small>Upload some files to see them here</small>
-                    </div>
-                `;
+                filesTable.style.display = 'none';
+                noFilesMessage.style.display = 'block';
+                filesCount.textContent = '0';
                 return;
             }
 
+            filesTable.style.display = 'table';
+            noFilesMessage.style.display = 'none';
+            filesCount.textContent = files.length;
+
             const filesHtml = files.map(file => {
-                // Validate file object
-                if (!file || !file.id) {
-                    console.warn('Invalid file object:', file);
-                    return '';
-                }
+                if (!file || !file.id) return '';
                 
                 return `
-                <div class="file-card" data-file-id="${file.id}">
-                    <div class="flex items-center justify-between">
+                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <td class="w-4 p-4">
                         <div class="flex items-center">
-                            <div class="mr-3">
-                                ${getFilePreview(file)}
-                            </div>
-                            <div>
-                                <h6 class="font-semibold">${file.originalName || file.name || 'Unknown File'}</h6>
-                                <small class="text-gray-500">
-                                    ${getFileTypeIcon(file.fileType || getFileTypeFromName(file.originalName || file.name))} ${(file.fileType || getFileTypeFromName(file.originalName || file.name)).toUpperCase()} • 
-                                    ${formatFileSize(file.size || 0)} • 
-                                    Used ${file.usageCount || 0} times
-                                </small>
-                                ${file.description ? `<br><small class="text-blue-600">${file.description}</small>` : ''}
-                                <br><small class="text-gray-400">${new Date(file.createdAt || file.created_at || Date.now()).toLocaleDateString()}</small>
-                            </div>
+                            <input type="checkbox" class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
                         </div>
-                        <div class="flex space-x-2">
-                            <button onclick="openSendFileModal('${file.id}')" class="bg-green-500 hover:bg-green-700 text-white text-xs px-2 py-1 rounded" title="Send via WhatsApp">
-                                <i class="bi bi-whatsapp"></i>
-                            </button>
-                            <button onclick="previewFile('${file.id}')" class="bg-blue-500 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded" title="Preview">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button onclick="deleteFile('${file.id}')" class="bg-red-500 hover:bg-red-700 text-white text-xs px-2 py-1 rounded" title="Delete">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                    </td>
+                    <td class="flex items-center p-4 mr-12 space-x-6 whitespace-nowrap">
+                        ${getFilePreview(file)}
+                        <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                            <div class="text-base font-semibold text-gray-900 dark:text-white">${file.originalName || file.name || 'Unknown File'}</div>
+                            <div class="text-sm font-normal text-gray-500 dark:text-gray-400">${file.description || 'No description'}</div>
                         </div>
-                    </div>
-                </div>
-            `}).filter(html => html !== '').join('');
+                    </td>
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                            ${getFileTypeClass(file.fileType || getFileTypeFromName(file.originalName || file.name))}">
+                            ${(file.fileType || getFileTypeFromName(file.originalName || file.name)).toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        ${formatFileSize(file.size || 0)}
+                    </td>
+                    <td class="p-4 text-base font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                        ${file.usageCount || 0} times
+                    </td>
+                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        ${new Date(file.createdAt || file.created_at || Date.now()).toLocaleDateString()}
+                    </td>
+                    <td class="p-4 space-x-2 whitespace-nowrap">
+                        <button type="button" onclick="openSendFileModal('${file.id}')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                            Send
+                        </button>
+                        <button type="button" onclick="previewFile('${file.id}')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg>
+                            Preview
+                        </button>
+                        <button type="button" onclick="deleteFile('${file.id}')" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }).filter(html => html !== '').join('');
 
-            container.innerHTML = filesHtml;
+            tableBody.innerHTML = filesHtml;
         }
 
-        // File preview helper
+        // Load user files
+        async function loadUserFiles() {
+            try {
+                const response = await fetch('/api/whatsapp/files?sortBy=createdAt&sortOrder=DESC&limit=100');
+                if (!response.ok) throw new Error(`Failed to load files: ${response.statusText}`);
+
+                const data = await response.json();
+                let files = [];
+                if (data.data && Array.isArray(data.data)) {
+                    files = data.data;
+                } else if (data.files && Array.isArray(data.files)) {
+                    files = data.files;
+                } else if (Array.isArray(data)) {
+                    files = data;
+                }
+                
+                allFiles = files;
+                renderFilesList(allFiles);
+            } catch (error) {
+                console.error('Error loading files:', error);
+                showAlert('Failed to load files: ' + error.message, 'error');
+            }
+        }
+
+        // Helper functions
         function getFilePreview(file) {
             const fileName = file.originalName || file.name || '';
             const fileType = file.fileType || getFileTypeFromName(fileName);
             
             if (fileType === 'image' || file.mimetype?.startsWith('image/')) {
-                return `<img src="/api/whatsapp/files/${file.id}/preview" class="file-preview" 
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="file-icon" style="display: none;">📷</div>`;
+                return `<img class="w-10 h-10 rounded-full" src="/api/whatsapp/files/${file.id}/preview" alt="File preview" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold" style="display: none;">IMG</div>`;
             } else {
                 const icon = getFileTypeIcon(fileType);
-                return `<div class="file-icon">${icon}</div>`;
+                return `<div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold">${icon}</div>`;
             }
         }
 
@@ -643,69 +767,36 @@
 
         function getFileTypeIcon(type) {
             const icons = {
-                image: '🖼️',
-                video: '🎥',
-                document: '📄',
-                audio: '🎵',
-                unknown: '📁'
+                image: 'IMG',
+                video: 'VID',
+                document: 'DOC',
+                audio: 'AUD',
+                unknown: 'FILE'
             };
-            return icons[type] || '📁';
+            return icons[type] || 'FILE';
         }
 
-        // File list click handler (delegated events)
-        function handleFileListClick(e) {
-            const fileId = e.target.closest('[data-file-id]')?.dataset.fileId;
-
-            if (e.target.classList.contains('file-checkbox')) {
-                toggleFileSelection(fileId, e.target.checked);
-            } else if (e.target.closest('.send-file-btn')) {
-                openSendFileModal(fileId);
-            } else if (e.target.closest('.preview-file-btn')) {
-                previewFile(fileId);
-            } else if (e.target.closest('.delete-file-btn')) {
-                deleteFile(fileId);
-            }
-        }
-
-        // Selection functions
-        function toggleFileSelection(fileId, selected) {
-            if (selected) {
-                if (!selectedFileIds.includes(fileId)) {
-                    selectedFileIds.push(fileId);
-                }
-            } else {
-                selectedFileIds = selectedFileIds.filter(id => id !== fileId);
-            }
-            updateBulkActions();
-        }
-
-        function selectAllFiles() {
-            selectedFileIds = allFiles.map(file => file.id);
-            document.querySelectorAll('.file-checkbox').forEach(cb => cb.checked = true);
-            updateBulkActions();
-        }
-
-        function clearSelection() {
-            selectedFileIds = [];
-            document.querySelectorAll('.file-checkbox').forEach(cb => cb.checked = false);
-            updateBulkActions();
-        }
-
-        function updateBulkActions() {
-            const bulkCard = document.getElementById('bulkActionsCard');
-            const count = selectedFileIds.length;
-
-            if (count > 0) {
-                bulkCard.style.display = 'block';
-                document.getElementById('selectedCount').textContent = count;
-            } else {
-                bulkCard.style.display = 'none';
-            }
+        function getFileTypeClass(type) {
+            const classes = {
+                image: 'bg-green-100 text-green-800',
+                video: 'bg-blue-100 text-blue-800',
+                document: 'bg-purple-100 text-purple-800',
+                audio: 'bg-yellow-100 text-yellow-800',
+                unknown: 'bg-gray-100 text-gray-800'
+            };
+            return classes[type] || 'bg-gray-100 text-gray-800';
         }
 
         // File actions
-        async function deleteFile(fileId) {
-            if (!confirm('Are you sure you want to delete this file?')) return;
+        function deleteFile(fileId) {
+            // Store fileId globally for use in confirmDelete
+            window.fileToDelete = fileId;
+            document.getElementById('deleteFileModal').classList.remove('hidden');
+        }
+
+        async function confirmDeleteFile() {
+            const fileId = window.fileToDelete;
+            if (!fileId) return;
 
             try {
                 const response = await fetch(`/api/whatsapp/files/${fileId}`, {
@@ -717,38 +808,19 @@
 
                 if (!response.ok) throw new Error('Delete failed');
 
-                showNotification('File deleted successfully', 'success');
+                showAlert('File deleted successfully', 'success');
                 loadUserFiles();
-                loadUserStats();
             } catch (error) {
                 console.error('Delete error:', error);
-                showNotification('Delete failed: ' + error.message, 'error');
+                showAlert('Delete failed: ' + error.message, 'error');
+            } finally {
+                closeDeleteFileModal();
             }
         }
 
-        async function bulkDeleteFiles() {
-            if (selectedFileIds.length === 0) return;
-            if (!confirm(`Delete ${selectedFileIds.length} selected files?`)) return;
-
-            try {
-                // Delete files one by one since we don't have bulk delete endpoint
-                for (const fileId of selectedFileIds) {
-                    await fetch(`/api/whatsapp/files/${fileId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                }
-
-                showNotification(`${selectedFileIds.length} files deleted successfully`, 'success');
-                selectedFileIds = [];
-                loadUserFiles();
-                loadUserStats();
-            } catch (error) {
-                console.error('Bulk delete error:', error);
-                showNotification('Bulk delete failed: ' + error.message, 'error');
-            }
+        function closeDeleteFileModal() {
+            document.getElementById('deleteFileModal').classList.add('hidden');
+            window.fileToDelete = null;
         }
 
         function previewFile(fileId) {
@@ -759,15 +831,12 @@
             const fileType = file.fileType || getFileTypeFromName(fileName);
 
             if (fileType === 'image' || file.mimetype?.startsWith('image/')) {
-                // For images, open in new tab
                 const imageUrl = `/api/whatsapp/files/${fileId}/preview`;
                 window.open(imageUrl, '_blank');
             } else if (fileType === 'video') {
-                // For videos, show info or try to play
                 const videoUrl = `/api/whatsapp/files/${fileId}/preview`;
                 window.open(videoUrl, '_blank');
             } else {
-                // For other files, show info
                 alert(`File: ${fileName}\nType: ${fileType}\nSize: ${formatFileSize(file.size || 0)}\nUploaded: ${new Date(file.createdAt || file.created_at).toLocaleString()}\n\nTo download, use the file URL: /api/whatsapp/files/${fileId}/preview`);
             }
         }
@@ -779,19 +848,17 @@
 
             currentFileToSend = file;
 
-            // Update modal content
             document.getElementById('sendFileName').textContent = file.originalName || file.name;
             document.getElementById('sendFileInfo').textContent = `${(file.fileType || 'unknown').toUpperCase()} • ${formatFileSize(file.size)}`;
 
             const previewContainer = document.getElementById('sendFilePreview');
             previewContainer.innerHTML = getFilePreview(file);
 
-            // Show modal
-            document.getElementById('sendFileModal').classList.remove('hidden');
+            document.getElementById('send-modal').classList.remove('hidden');
         }
 
         function closeSendModal() {
-            document.getElementById('sendFileModal').classList.add('hidden');
+            document.getElementById('send-modal').classList.add('hidden');
             currentFileToSend = null;
         }
 
@@ -802,7 +869,7 @@
             const caption = document.getElementById('sendCaption').value.trim();
 
             if (!phoneNumber) {
-                alert('Please enter a phone number');
+                showAlert('Please enter a phone number', 'error');
                 return;
             }
 
@@ -824,23 +891,13 @@
                     throw new Error(errorData.message || 'Send failed');
                 }
 
-                const result = await response.json();
-                showNotification('File sent successfully!', 'success');
-
-                // Close modal
+                showAlert('File sent successfully!', 'success');
                 closeSendModal();
-
-                // Refresh files to update usage count
                 loadUserFiles();
             } catch (error) {
                 console.error('Send error:', error);
-                showNotification('Send failed: ' + error.message, 'error');
+                showAlert('Send failed: ' + error.message, 'error');
             }
-        }
-
-        // Filter files
-        function filterFiles() {
-            loadUserFiles(); // Reload with new filters
         }
 
         // Utility functions
@@ -852,49 +909,21 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
-        function formatTimeAgo(dateString) {
-            const now = new Date();
-            const date = new Date(dateString);
-            const diff = now - date;
-
-            const minutes = Math.floor(diff / 60000);
-            const hours = Math.floor(diff / 3600000);
-            const days = Math.floor(diff / 86400000);
-
-            if (days > 0) return `${days}d ago`;
-            if (hours > 0) return `${hours}h ago`;
-            if (minutes > 0) return `${minutes}m ago`;
-            return 'Just now';
-        }
-
-        function showNotification(message, type = 'info') {
-            const alertClass = {
-                success: 'bg-green-100 border-green-400 text-green-700',
-                error: 'bg-red-100 border-red-400 text-red-700',
-                warning: 'bg-yellow-100 border-yellow-400 text-yellow-700',
-                info: 'bg-blue-100 border-blue-400 text-blue-700'
-            }[type] || 'bg-blue-100 border-blue-400 text-blue-700';
-
-            const notification = document.createElement('div');
-            notification.className = `border px-4 py-3 rounded notification ${alertClass}`;
-            notification.innerHTML = `
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alert-container');
+            const alertClass = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+            
+            alertContainer.innerHTML = `
+                <div class="${alertClass} border px-4 py-3 rounded mb-4">
                 ${message}
-                <button type="button" class="float-right font-bold" onclick="this.parentElement.remove()">&times;</button>
+                </div>
             `;
-
-            document.body.appendChild(notification);
-
-            // Show notification
-            setTimeout(() => notification.classList.add('show'), 100);
-
-            // Auto hide after 5 seconds
+            
             setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.classList.remove('show');
-                    setTimeout(() => notification.remove(), 300);
-                }
+                alertContainer.innerHTML = '';
             }, 5000);
         }
+
     </script>
 </body>
 </html>

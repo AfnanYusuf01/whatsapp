@@ -6,124 +6,94 @@
     <title><%= title %></title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-xl font-bold"><%= title %></h1>
-                </div>
-                <div class="flex items-center">
-                    <span class="mr-4">Welcome, <%= user.full_name %></span>
-                    <a href="/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
+<body class="bg-gray-100 dark:bg-gray-900">
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <!-- CRUD Menu Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- Device Management -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Device Management</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/devices" class="block text-blue-600 hover:underline">📱 Manage Devices</a>
+        <div class="px-4 pt-6">
+            <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+                <!-- Main widget -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex-shrink-0">
+                            <span class="text-xl font-bold leading-none text-gray-900 sm:text-2xl dark:text-white">Welcome, <%= user.name || user.username || 'User' %></span>
+                            <h3 class="text-base font-light text-gray-500 dark:text-gray-400">WhatsApp Management Dashboard</h3>
+                        </div>
+                        <div class="flex items-center justify-end flex-1 text-base font-medium text-green-500 dark:text-green-400">
+                            <span class="mr-2">Role:</span>
+                            <span class="text-gray-900 dark:text-white"><%= user.role.replace('_', ' ') %></span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="/dashboard/devices" class="block p-4 bg-blue-50 border border-blue-200 rounded-lg shadow hover:bg-blue-100 dark:bg-blue-900 dark:border-blue-700 dark:hover:bg-blue-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                                <span class="font-semibold text-blue-900 dark:text-blue-100">Device Management</span>
+                            </div>
+                            <p class="text-sm text-blue-800 dark:text-blue-200">Manage your WhatsApp devices</p>
+                        </a>
+                        <a href="/dashboard/messages" class="block p-4 bg-green-50 border border-green-200 rounded-lg shadow hover:bg-green-100 dark:bg-green-900 dark:border-green-700 dark:hover:bg-green-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                                <span class="font-semibold text-green-900 dark:text-green-100">Message Management</span>
+                            </div>
+                            <p class="text-sm text-green-800 dark:text-green-200">Send and manage WhatsApp messages</p>
+                        </a>
+                        <a href="/dashboard/files" class="block p-4 bg-yellow-50 border border-yellow-200 rounded-lg shadow hover:bg-yellow-100 dark:bg-yellow-900 dark:border-yellow-700 dark:hover:bg-yellow-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                <span class="font-semibold text-yellow-900 dark:text-yellow-100">File Management</span>
+                            </div>
+                            <p class="text-sm text-yellow-800 dark:text-yellow-200">Upload and manage files</p>
+                        </a>
+                        <a href="/dashboard/warmer" class="block p-4 bg-pink-50 border border-pink-200 rounded-lg shadow hover:bg-pink-100 dark:bg-pink-900 dark:border-pink-700 dark:hover:bg-pink-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-pink-600 dark:text-pink-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 12a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                <span class="font-semibold text-pink-900 dark:text-pink-100">Warmer Service</span>
+                            </div>
+                            <p class="text-sm text-pink-800 dark:text-pink-200">WhatsApp Warmer tools</p>
+                        </a>
+                        <a href="/dashboard/contacts" class="block p-4 bg-purple-50 border border-purple-200 rounded-lg shadow hover:bg-purple-100 dark:bg-purple-900 dark:border-purple-700 dark:hover:bg-purple-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zm2 2a7 7 0 00-7 7v1a1 1 0 001 1h12a1 1 0 001-1v-1a7 7 0 00-7-7z"></path></svg>
+                                <span class="font-semibold text-purple-900 dark:text-purple-100">Contact Management</span>
+                            </div>
+                            <p class="text-sm text-purple-800 dark:text-purple-200">Manage contacts and tags</p>
+                        </a>
+                        <% if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_GLOBAL') { %>
+                        <a href="/dashboard/users" class="block p-4 bg-gray-50 border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-gray-600 dark:text-gray-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m0-4a4 4 0 100-8 4 4 0 000 8zm6 4v-2a4 4 0 00-3-3.87"></path></svg>
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">User Management</span>
+                            </div>
+                            <p class="text-sm text-gray-800 dark:text-gray-200">Manage users and permissions</p>
+                        </a>
+                        <a href="/dashboard/agencies" class="block p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow hover:bg-indigo-100 dark:bg-indigo-900 dark:border-indigo-700 dark:hover:bg-indigo-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M3 7a1 1 0 011-1h12a1 1 0 011 1v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm2-3a1 1 0 00-1 1v1h14V5a1 1 0 00-1-1H5z"></path></svg>
+                                <span class="font-semibold text-indigo-900 dark:text-indigo-100">Agency Management</span>
+                            </div>
+                            <p class="text-sm text-indigo-800 dark:text-indigo-200">Manage agencies</p>
+                        </a>
+                        <% } %>
+                        <% if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_GLOBAL' || user.role === 'AGENCY') { %>
+                        <a href="/dashboard/subscriptions" class="block p-4 bg-teal-50 border border-teal-200 rounded-lg shadow hover:bg-teal-100 dark:bg-teal-900 dark:border-teal-700 dark:hover:bg-teal-800 transition">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-6 h-6 text-teal-600 dark:text-teal-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M12 8c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm-2 4c-2.21 0-4 1.79-4 4v1h8v-1c0-2.21-1.79-4-4-4z"></path></svg>
+                                <span class="font-semibold text-teal-900 dark:text-teal-100">Subscription Management</span>
+                            </div>
+                            <p class="text-sm text-teal-800 dark:text-teal-200">Manage subscriptions and user subscriptions</p>
+                        </a>
+                        <% } %>
                     </div>
                 </div>
-
-                <!-- Message Management -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Message Management</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/messages" class="block text-blue-600 hover:underline">💬 Send Messages</a>
-                    </div>
-                </div>
-
-                <!-- File Management -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">File Management</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/files" class="block text-blue-600 hover:underline">📁 Manage Files</a>
-                    </div>
-                </div>
-
-                <!-- Warmer Service -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Warmer Service</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/warmer" class="block text-blue-600 hover:underline">🔥 WhatsApp Warmer</a>
-                    </div>
-                </div>
-
-                <!-- Contact Management -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Contact Management</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/contacts" class="block text-blue-600 hover:underline">📋 Manage Contacts</a>
-                        <a href="/dashboard/contact-tags" class="block text-blue-600 hover:underline">🏷️ Manage Contact Tags</a>
-                    </div>
-                </div>
-
-                <% if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_GLOBAL') { %>
-                <!-- User Management -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">User Management</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/users" class="block text-blue-600 hover:underline">👥 Manage Users</a>
-                    </div>
-                </div>
-
-                <!-- Agency Management -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Agency Management</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/agencies" class="block text-blue-600 hover:underline">🏢 Agency Management</a>
-                    </div>
-                </div>
-                <% } %>
-
-                <% if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_GLOBAL' || user.role === 'AGENCY') { %>
-                <!-- Subscription Management -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Subscription Management</h3>
-                    <div class="space-y-2">
-                        <a href="/dashboard/subscriptions" class="block text-blue-600 hover:underline">💰 Manage Subscriptions</a>
-                        <a href="/dashboard/user-subscriptions" class="block text-blue-600 hover:underline">👤 User Subscriptions</a>
-                    </div>
-                </div>
-                <% } %>
-
-                <!-- Role-specific Features -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Your Role: <%= user.role.replace('_', ' ') %></h3>
-                    <% if (user.role === 'SUPER_ADMIN') { %>
-                        <p class="text-gray-600">You have full access to all features including user management, agency management, and subscription management.</p>
-                    <% } else if (user.role === 'ADMIN_GLOBAL') { %>
-                        <p class="text-gray-600">You can manage users, agencies, and subscriptions globally.</p>
-                    <% } else if (user.role === 'AGENCY') { %>
-                        <p class="text-gray-600">You can manage your agency's subscriptions and view user subscriptions.</p>
-                    <% } else if (user.role === 'ADMIN_AGENCY') { %>
-                        <p class="text-gray-600">You can manage agency-specific settings and subscriptions.</p>
-                    <% } else { %>
-                        <p class="text-gray-600">You can manage your personal contacts and contact tags.</p>
-                    <% } %>
-                </div>
-
-                <!-- Quick Stats -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold mb-4">Quick Stats</h3>
-                    <div class="space-y-2 text-sm text-gray-600">
-                        <p>📊 Dashboard Overview</p>
+                <!-- Quick Stats Widget -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h3>
+                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                         <p>🕐 Last Login: <%= user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never' %></p>
                         <p>📅 Member since: <%= new Date(user.created_at).toLocaleDateString() %></p>
+                        <p>👤 Email: <%= user.email || 'user@example.com' %></p>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>

@@ -1,6 +1,7 @@
 import express from 'express';
-import { showLoginPage, login, logout, showDashboard } from '../controllers/authController.js';
-import { verifyToken } from '../middleware/auth.js';
+import { showLoginPage, login, logout, showDashboard, showRegisterPage, register } from '../controllers/authController.js';
+import { showLandingPage} from '../controllers/landingController.js';
+import { verifyToken, cekUser } from '../middleware/auth.js';
 
 // Import CRUD controllers
 import * as userController from '../controllers/userController.js';
@@ -12,16 +13,38 @@ import * as userSubscriptionController from '../controllers/userSubscriptionCont
 import * as deviceController from '../controllers/deviceController.js';
 import * as messageController from '../controllers/messageController.js';
 import * as fileController from '../controllers/fileController.js';
+import * as orderController from '../controllers/orderController.js';
+import * as paymentController from '../controllers/paymentController.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 const router = express.Router();
+
+// Landing page route - with auth status check
+router.get('/',cekUser, showLandingPage);
 
 // Public routes
 router.get('/login', showLoginPage);
 router.post('/login', login);
+router.get('/register', showRegisterPage);
+router.post('/register', register);
 router.get('/logout', logout);
+
+// Subscription page route - now using controller to fetch data from database with auth status check
+
 
 // Protected routes
 router.get('/dashboard', verifyToken, showDashboard);
+
+// User settings page
+router.get('/settings', verifyToken, (req, res) => {
+  res.render('settings', { title: 'User Settings', user: req.user });
+});
 
 // User CRUD routes
 router.get('/dashboard/users', verifyToken, userController.index);
@@ -81,6 +104,7 @@ router.post('/dashboard/user-subscriptions/:id/delete', verifyToken, userSubscri
 // Device Management routes
 router.get('/dashboard/devices', verifyToken, deviceController.index);
 router.get('/dashboard/devices/:id/settings', verifyToken, deviceController.showSettings);
+router.get('/dashboard/devices/check-limit', verifyToken, deviceController.checkDeviceLimit);
 
 // Message Management routes
 router.get('/dashboard/messages', verifyToken, messageController.index);
@@ -96,14 +120,19 @@ router.get('/dashboard/warmer', verifyToken, (req, res) => {
   });
 });
 
-// Redirect root to dashboard if authenticated, otherwise to login
-router.get('/', (req, res) => {
-  const token = req.cookies.token;
-  if (token) {
-    res.redirect('/dashboard');
-  } else {
-    res.redirect('/login');
-  }
+// Tambahkan route order
+router.post('/order', verifyToken, orderController.createOrder);
+router.get('/order/:id', verifyToken, orderController.showOrderDetail);
+
+// Payment Management (hanya untuk SUPER_ADMIN/ADMIN_GLOBAL)
+router.get('/dashboard/payments', verifyToken, paymentController.listPayments);
+router.post('/dashboard/payments', verifyToken, paymentController.createPayment);
+router.post('/dashboard/payments/:id', verifyToken, paymentController.updatePayment);
+router.post('/dashboard/payments/:id/delete', verifyToken, paymentController.deletePayment);
+
+// Maintenance page (public)
+router.get('/personalization', (req, res) => {
+  res.render('content/pages/maintenance', { title: 'Maintenance'});
 });
 
 export default router; 

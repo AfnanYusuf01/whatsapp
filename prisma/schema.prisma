@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -16,8 +16,8 @@ enum UserRole {
 }
 
 model User {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  agency_id  String?   @db.Uuid
+  id         String    @id @default(cuid()) // Menggunakan cuid() untuk MySQL
+  agency_id  String?   // Hapus @db.Uuid untuk MySQL
   username   String
   email      String
   password   String
@@ -27,18 +27,19 @@ model User {
   is_active  Boolean   @default(true)
   last_login DateTime?
   created_at DateTime  @default(now())
-  updated_at DateTime
+  updated_at DateTime  @updatedAt
 
   agency            Agency?            @relation("AgencyUsers", fields: [agency_id], references: [id])
   ownedAgency       Agency[]           @relation("AgencyOwner")
   contactTags       ContactTag[]
   contacts          Contact[]
   userSubscriptions UserSubscription[]
+  orders            Order[]
 }
 
 model Agency {
-  id           String   @id @db.Uuid
-  owner_id     String   @db.Uuid
+  id           String   @id @default(cuid()) // Menggunakan cuid() untuk MySQL
+  owner_id     String   // Hapus @db.Uuid untuk MySQL
   name         String
   slug         String
   domain       String?
@@ -48,9 +49,9 @@ model Agency {
   favicon_url  String?
   is_active    Boolean  @default(true)
   created_at   DateTime @default(now())
-  updated_at   DateTime
+  updated_at   DateTime @updatedAt
 
-  owner         User           @relation("AgencyOwner", fields: [owner_id], references: [id]) // relasi dinyatakan eksplisit
+  owner         User           @relation("AgencyOwner", fields: [owner_id], references: [id])
   users         User[]         @relation("AgencyUsers")
   subscriptions Subscription[]
 }
@@ -58,9 +59,9 @@ model Agency {
 model ContactTag {
   id         Int      @id @default(autoincrement())
   name       String
-  user_id    String   @db.Uuid
+  user_id    String   // Hapus @db.Uuid untuk MySQL
   created_at DateTime @default(now())
-  updated_at DateTime
+  updated_at DateTime @updatedAt
 
   user     User      @relation(fields: [user_id], references: [id])
   contacts Contact[]
@@ -72,11 +73,11 @@ model Contact {
   phone   String
   email   String?
   notes   String?
-  user_id String  @db.Uuid
+  user_id String  // Hapus @db.Uuid untuk MySQL
   tag_id  Int?
 
   created_at DateTime @default(now())
-  updated_at DateTime
+  updated_at DateTime @updatedAt
 
   user User        @relation(fields: [user_id], references: [id])
   tag  ContactTag? @relation(fields: [tag_id], references: [id])
@@ -84,7 +85,7 @@ model Contact {
 
 model Subscription {
   id            Int      @id @default(autoincrement())
-  owner_id      String   @db.Uuid
+  owner_id      String   // Hapus @db.Uuid untuk MySQL
   name          String
   duration_days Int
   limit_device  Int      @default(1)
@@ -92,21 +93,43 @@ model Subscription {
   price         Decimal  @default(0)
   is_active     Boolean  @default(true)
   created_at    DateTime @default(now())
-  updated_at    DateTime
+  updated_at    DateTime @updatedAt
 
   owner             Agency             @relation(fields: [owner_id], references: [id])
   userSubscriptions UserSubscription[]
+  orders            Order[]
 }
 
 model UserSubscription {
   id              Int      @id @default(autoincrement())
-  user_id         String   @db.Uuid
+  user_id         String   // Hapus @db.Uuid untuk MySQL
   subscription_id Int
   status          String   @default("ACTIVE")
   start_date      DateTime
   end_date        DateTime
   created_at      DateTime @default(now())
-  updated_at      DateTime
+  updated_at      DateTime @updatedAt
+
+  user         User         @relation(fields: [user_id], references: [id])
+  subscription Subscription @relation(fields: [subscription_id], references: [id])
+}
+
+model Order {
+  id              String        @id @default(cuid()) // Menggunakan cuid() untuk MySQL
+  user_id         String        // Hapus @db.Uuid untuk MySQL
+  subscription_id Int
+  amount          Decimal       @default(0)
+  payment_method  String?
+  payment_status  String        @default("PENDING")
+  snap_token      String?
+  payment_url     String?
+  metadata        Json?
+  invoice_number  String?       @unique
+  external_id     String?
+  expired_at      DateTime?
+  paid_at         DateTime?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
 
   user         User         @relation(fields: [user_id], references: [id])
   subscription Subscription @relation(fields: [subscription_id], references: [id])
